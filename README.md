@@ -20,5 +20,5 @@ The **Smart Grocery Management System** is a mobile app designed to help individ
 
 This project is built by Sena Orucu & Zarina Shevchenko.
 
-- **📧 Sena Orucu:**: orucusena21@gmail.com
-- **📧 Zarina Shevchenko:**: zarinashevchenko@gmail.com
+- **📧 Sena Orucu:** orucusena21@gmail.com
+- **📧 Zarina Shevchenko:** zarinashevchenko@gmail.com
