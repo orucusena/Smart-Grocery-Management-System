@@ -1,6 +1,6 @@
 # Smart-Grocery-Management-System
 
-The **Smart Grocery Management System** is a mobile app designed to help individuals and households manage their groceries efficiently, reduce waste, and prioritize food safety. It allows users to track inventory, receive expiration alerts, scan barcodes, and even get food recall notifications. This project is developed as part of our CISC.4900 class during the Spring of 2025, under the guidance of Professor Katherine Chuang at CUNNY-Brooklyn College.
+The **Smart Grocery Management System** is a mobile app designed to help individuals and households manage their groceries efficiently, reduce waste, and prioritize food safety. It allows users to track inventory, receive expiration alerts, scan barcodes, and even get food recall notifications. This project is developed as part of our CISC.4900 class during the Spring of 2025, under the guidance of Allan James Lapid & Professor Katherine Chuang at CUNY-Brooklyn College.
 
 ## 🚀 Features
 - 📋 **Inventory Management** - Easily add, edit, and delete grocery items.
