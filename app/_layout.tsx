@@ -18,11 +18,14 @@ import { FIREBASE_AUTH } from '@/firebaseConfig';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import HomeScreen from './(tabs)';
 
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
+
 const Stack = createNativeStackNavigator();
 const InsideStack = createNativeStackNavigator();
+
 
 function MainStack() {
   return (
@@ -33,6 +36,7 @@ function MainStack() {
     </Stack.Navigator>
   );
 }
+
 
 function InsideLayout() {
   return (
@@ -45,12 +49,16 @@ function InsideLayout() {
 }
 
 
+
+
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [user, setUser] = useState<User | null>(null);
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });  
+  });
+
+
 
 
   useEffect(() => {
@@ -60,10 +68,12 @@ export default function RootLayout() {
       setUser(user); // Set the user on auth state change
     });
 
+
     // Hide the splash screen once fonts are loaded
     if (loaded) {
       SplashScreen.hideAsync();
     }
+
 
     // Cleanup the auth listener when the component unmounts
     return () => {
@@ -71,17 +81,19 @@ export default function RootLayout() {
     };
   }, [loaded]); // Dependencies: when 'loaded' changes, this effect will run
 
+
   // If the app is still loading, render nothing
   if (!loaded) {
     return null;
   }
+
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       {user ? <InsideLayout /> : <MainStack />}
       <StatusBar style="auto" />
     </ThemeProvider>
-      
+
   );
 }
 

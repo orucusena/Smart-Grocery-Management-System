@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { View, TextInput, Button, Text, Alert, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { addInventoryItem, getInventoryItems, updateInventoryItem, deleteInventoryItem, checkForExpiredItems } from "./firestore"; 
+import { addInventoryItem, getInventoryItems, updateInventoryItem, deleteInventoryItem, checkForExpiredItems } from "./firestore";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Platform } from "react-native";
 
 const InventoryScreen = () => {
   const [name, setName] = useState("");
@@ -29,7 +30,7 @@ const InventoryScreen = () => {
     } else {
       console.warn("Date selection was canceled.");
     }
-  };  
+  };
 
   const handleAddOrUpdateItem = async () => {
     if (!name || !quantity || !category || !expirationDate) {
@@ -38,7 +39,7 @@ const InventoryScreen = () => {
     }
 
     try {
-      const formattedDate = expirationDate.toISOString().split("T")[0]; 
+      const formattedDate = expirationDate.toISOString().split("T")[0];
 
       if (editingId) {
         await updateInventoryItem(editingId, { name, quantity: parseInt(quantity), category, expirationDate: formattedDate });
@@ -53,7 +54,7 @@ const InventoryScreen = () => {
       setQuantity("");
       setCategory("");
       setExpirationDate(new Date());
-      fetchInventory(); 
+      fetchInventory();
     } catch (error) {
       console.error("Error adding/updating item:", error);
       Alert.alert("Error", "Failed to save item. Please try again.");
@@ -67,23 +68,29 @@ const InventoryScreen = () => {
       <TextInput style={styles.input} placeholder="Quantity" value={quantity} onChangeText={setQuantity} keyboardType="numeric" />
       <TextInput style={styles.input} placeholder="Category" value={category} onChangeText={setCategory} />
 
+
       {/* Date Picker */}
       <TouchableOpacity onPress={() => setIsDatePickerVisible(true)} style={styles.datePicker}>
-        <Text style={styles.dateText}>📅 {expirationDate ? expirationDate.toDateString() : "Select Expiration Date"}</Text>
+        <Text style={styles.dateText}>
+          📅 {expirationDate ? expirationDate.toDateString() : "Select Expiration Date"}
+        </Text>
       </TouchableOpacity>
 
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={(date) => {
-          setIsDatePickerVisible(false);
-          if (date) {
-            setExpirationDate(date);
-          }
-        }}
-        onCancel={() => setIsDatePickerVisible(false)}
-        display="default"
-      />
+
+      {/* Actual Date Picker */}
+      {isDatePickerVisible && (
+        <DateTimePicker
+          value={expirationDate}
+          mode="date"
+          display={Platform.OS === "ios" ? "spinner" : "default"}
+          onChange={(event, selectedDate) => {
+            setIsDatePickerVisible(false);
+            if (event.type !== "dismissed" && selectedDate) {
+              setExpirationDate(selectedDate);
+            }
+          }}
+        />
+      )}
 
       <Button title={editingId ? "Update Item" : "Add Item"} onPress={handleAddOrUpdateItem} />
 
@@ -96,12 +103,12 @@ const InventoryScreen = () => {
             <Text style={styles.itemDetail}>📆 {item.expirationDate}</Text>
             <Text style={styles.itemDetail}>🔢 {item.quantity}</Text>
             <View style={styles.buttonContainer}>
-              <TouchableOpacity onPress={() => { 
-                setEditingId(item.id); 
-                setName(item.name); 
-                setQuantity(item.quantity.toString()); 
-                setCategory(item.category); 
-                setExpirationDate(new Date(item.expirationDate)); 
+              <TouchableOpacity onPress={() => {
+                setEditingId(item.id);
+                setName(item.name);
+                setQuantity(item.quantity.toString());
+                setCategory(item.category);
+                setExpirationDate(new Date(item.expirationDate));
               }}>
                 <Text style={styles.editButton}>✏️ Edit</Text>
               </TouchableOpacity>

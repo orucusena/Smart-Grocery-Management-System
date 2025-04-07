@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
-//import { db } from "../../firebaseConfig";
-import { FIREBASE_DB } from '@/firebaseConfig'; 
+import { FIREBASE_DB } from '@/firebaseConfig';
 import { collection, onSnapshot, DocumentData } from "firebase/firestore";
-import InventoryScreen from "../../InventoryScreen"; 
+import InventoryScreen from "../../InventoryScreen";
 
 export default function HomeScreen() {
   const [testData, setTestData] = useState<DocumentData[]>([]);
