@@ -2,11 +2,11 @@
 
 ## 🗓️ Timeline & Weekly Plan
 
-**Document Version:** 1.1  
+**Document Version:** 1.2  
 
-**Last Updated:** February 26, 2025
+**Last Updated:** April 19, 2025
 
-**Change Log:** Adjusted project timeline and task distribution
+**Change Log:** Adjusted project timeline
 
 ## Week 5-6 (Feb 24 - Mar 9): Core Features Development
 ✅ **Firebase Authentication Setup: 3 days**
@@ -27,10 +27,6 @@
 ✅ **Inventory Management Development: 5-6 days**
   - Continue implementing inventory management.
   - Allow users to add, update, and view items in Firebase Firestore.
-  
-✅ **Barcode Scanning Setup: 4-5 days**
-  - Implement barcode scanning feature using React Native and a relevant package (like react-native-camera).
-  - Ensure it links to the inventory management system.
 
 ✅ **Testing & Debugging: 3-4 days**
   - Conduct testing for all features: authentication, inventory management, barcode scanning.
@@ -42,54 +38,49 @@
 
 ## Week 9-10 (Mar 24 - Apr 6): Feature Refinement 
 
+✅ **Presentation Slides (First Draft): 3-4 days**
+  - Start working on the first draft of presentation slides. Focus on the system architecture, MVP features, and progress.
+**<ins>Due on March 31st</ins>**
+  
+✅ **Demo Recording 2: 2 days**
+  - Record the second demo showcasing all developed features (2-5 minutes).
+**<ins>Due on April 7th</ins>** 
+  
+✅ **Supervisor Evaluation 1:**
+**<ins>Due on April 11th</ins>** 
+
+## Week 11-12 (Apr 7 - Apr 20): Finalization & Bug Fixes
+
+✅ **Barcode Scanning Setup: 4-5 days**
+  - Implement barcode scanning feature using React Native and a relevant package (like react-native-camera).
+  - Ensure it links to the inventory management system.
+
+✅ **Recipe Suggestions (Optional): 5 days**
+  - If time permits, start working on recipe suggestions based on the inventory. Use simple algorithms for now.
+
 ✅ **Expiration Alerts: 5 days**
   - Implement expiration tracking with notifications.
   - Set up reminders based on expiry dates from the inventory.
   
 ✅ **Food Recall Integration (Optional): 5 days**
   - Integrate food recall API (if possible). Otherwise, just focus on core features.
-  
-✅ **Demo Recording 2: 2 days**
-  - Record the second demo showcasing all developed features (2-5 minutes).
-**<ins>Due on April 7th</ins>** 
-  
 
-## Week 11-12 (Apr 7 - Apr 20): Finalization & Bug Fixes
+## Week 13-14 (Apr 21 - May 5): Final Demo & Presentation Refinement
 
 ✅ **Recipe Suggestions (Optional): 5 days**
   - If time permits, start working on recipe suggestions based on the inventory. Use simple algorithms for now.
 
-✅ **Presentation Slides (First Draft): 3-4 days**
-  - Start working on the first draft of presentation slides. Focus on the system architecture, MVP features, and progress.
-**<ins>Due on March 31st</ins>**
-
-✅ **Finalizing Core Features: 4-5 days**
-  - Adjust features based on testing feedback.
-  - Optimize Firebase queries and app performance.
+✅ **Food Recall Integration**
+  - Keep working on the feature.
 
 ✅ **Final Testing & Debugging: 4-5 days**
   - Ensure all features work seamlessly. Resolve any final bugs.
-
-✅ **Supervisor Evaluation 1:**
-**<ins>Due on April 11th</ins>** 
-
-
-## Week 13-14 (Apr 21 - May 5): Final Demo & Presentation Refinement
-✅ **Final Testing & Debugging: 4-5 days**
-  - Ensure all features work seamlessly. Resolve any final bugs.
-
-✅ **Presentation Slides Refinement: 3-4 days**
-  - Refine the presentation slides. Make them clear and concise.
-**<ins>Due on May 12th</ins>** 
-
-✅ **Final Demo Recording: 4-5 days**
-  - Record and polish the final demo (10-15 minutes).
-**<ins>Due on May 12th</ins>** 
   
 ✅ **Self-Assessment Survey: 1 day**
   - Complete the self-assessment survey.
-**<ins>Due on April 28th</ins>** 
+**<ins>Due on April 28th</ins>**
 
+✅ **UI Design Ideas**
 
 ## Week 15 (May 6 - May 12): Final Review & Submission
 ✅ **Final Testing & Bug Fixes: 4 days**
