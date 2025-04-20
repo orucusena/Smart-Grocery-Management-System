@@ -1,31 +1,36 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
-import { FIREBASE_DB } from '@/firebaseConfig';
-import { collection, onSnapshot, DocumentData } from "firebase/firestore";
-import InventoryScreen from "../../InventoryScreen";
+import { collection, onSnapshot, DocumentData, query, where } from "firebase/firestore";
+import { FIREBASE_DB, FIREBASE_AUTH } from '@/firebaseConfig'; 
+import InventoryScreen from "../../InventoryScreen"; 
 
 export default function HomeScreen() {
   const [testData, setTestData] = useState<DocumentData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("Setting up Firestore listener...");
+    const user = FIREBASE_AUTH.currentUser;
+    if (!user) return;
 
-    // Firestore real-time listener to auto-refresh inventory when changes occur
-    const unsubscribe = onSnapshot(collection(FIREBASE_DB, "inventory"), (snapshot) => {
+    console.log("Setting up Firestore listener for user: ", user.uid);
+
+    const userQuery = query(
+      collection(FIREBASE_DB, "inventory"),
+      where("userId", "==", user.uid)
+    );
+
+    const unsubscribe = onSnapshot(userQuery, (snapshot) => {
       const data = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
       setTestData(data);
       setLoading(false);
-      console.log("Firestore Updated Data:", data);
+      console.log("User's Inventory Updated: ", data);
     });
 
-    return () => unsubscribe(); // Cleanup the listener when component unmounts
+    return () => unsubscribe();
   }, []);
-
-  console.log("Rendering UI with data:", testData);
 
   if (loading) {
     return (
@@ -63,7 +68,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f4f4f4", // Light gray background
+    backgroundColor: "#f4f4f4",
     justifyContent: "center",
   },
   title: {
@@ -81,7 +86,7 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 5,
-    elevation: 3, // Adds shadow on Android
+    elevation: 3,
   },
   itemName: {
     fontSize: 20,
