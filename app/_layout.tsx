@@ -17,6 +17,7 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { FIREBASE_AUTH } from '@/firebaseConfig';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import HomeScreen from './(tabs)';
+import BarcodeScanning from './(tabs)/BarcodeScanning';
 
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -44,6 +45,7 @@ function InsideLayout() {
       <InsideStack.Screen name="My todos" component={List} />
       <InsideStack.Screen name="Details" component={Details} />
       <InsideStack.Screen name="Inventory" component={HomeScreen} />
+      <InsideStack.Screen name="BarcodeScanning" component={BarcodeScanning} />
     </InsideStack.Navigator>
   );
 }
