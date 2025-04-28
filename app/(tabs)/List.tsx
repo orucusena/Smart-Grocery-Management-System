@@ -1,11 +1,8 @@
 import { View, Text, StyleSheet, TextInput, ActivityIndicator, Button, KeyboardAvoidingView } from 'react-native'
 import React, { useState } from 'react'
 import { NavigationProp } from '@react-navigation/native';
-<<<<<<< HEAD
 import { FIREBASE_AUTH } from '@/firebaseConfig'; 
-=======
-import { FIREBASE_AUTH } from '@/firebaseConfig';
->>>>>>> d395adf (Added barcode scanning camera)
+
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
