@@ -1,112 +1,462 @@
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { useState, useEffect, useRef } from 'react';
-import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, Modal, Platform, TextInput} from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { addDoc, collection } from 'firebase/firestore';
+import { FIREBASE_DB, FIREBASE_AUTH } from '@/firebaseConfig'; 
 
 const BarcodeScanning = () => {
-    const [facing, setFacing] = useState<CameraType>('back');
-    const [permission, requestPermission] = useCameraPermissions();
-    const [scanned, setScanned] = useState(false);
-    const hasScannedRef = useRef(false);
-
-
-    const handleBarCodeScanned = ({ type, data }: { type: string, data: string }) => {
-        if (hasScannedRef.current) return; // 👈 Ignore if already scanned
-        hasScannedRef.current = true;
-        setScanned(true);
-        const code = data;
-
-        console.log(`Scanned type: ${type}, data: ${data}`);
-        alert(`Scanned a ${type} code: ${data}`);
-    };
-
-
-    if (!permission) {
-        // Camera permissions are still loading.
-        return <View />;
+  const [facing, setFacing] = useState<CameraType>('back');  //default is 'back' camera.
+  const [permission, requestPermission] = useCameraPermissions();
+  const [scanned, setScanned] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const hasScannedRef = useRef(false);
+  
+  // State for the add item modal
+  const [modalVisible, setModalVisible] = useState(false);
+  const [scannedProduct, setScannedProduct] = useState<any>(null);
+  const [quantity, setQuantity] = useState('1');  //Stores the quantity, initially set to "1".
+  const [expirationDate, setExpirationDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  
+  // Format date for display
+  const formatDate = (date: Date) => {
+    return date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+  };
+  
+  // Handle date change
+  const onDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(Platform.OS === 'ios');
+    if (selectedDate) {
+      setExpirationDate(selectedDate);
     }
+  };
 
-    if (!permission.granted) {
-        // Camera permissions are not granted yet.
-        return (
-            <View style={styles.container}>
-                <Text style={styles.message}>We need your permission to show the camera</Text>
-                <Button onPress={requestPermission} title="grant permission" />
-            </View>
-        );
+  const fetchProductInfo = async (code: string) => {
+    setLoading(true);
+    try {
+      const url = `https://world.openfoodfacts.org/api/v0/product/${code}.json`;
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      if (data.status === 1) {
+        // Product found!
+        console.log('Product:', data.product);
+        
+        // Create product object
+        const product = {
+          barcode: code,
+          name: data.product.product_name || 'Unknown Product',
+          brand: data.product.brands || 'Unknown Brand',
+          image: data.product.image_url,
+          quantity: data.product.quantity || '',
+          categories: data.product.categories || '',
+        };
+        
+        // Set scanned product and show modal
+        setScannedProduct(product);
+        setModalVisible(true);
+      } else {
+        // Product not found
+        console.log('Product not found!');
+        alert('Product not found. Please try again or add manually.');
+        setScanned(false);
+        hasScannedRef.current = false;
+      }
+    } catch (error) {
+      console.error('Error fetching product data:', error);
+      alert('Error fetching product data. Please try again.');
+      setScanned(false);
+      hasScannedRef.current = false;
+    } finally {
+      setLoading(false);
     }
+  };
 
+  const handleBarCodeScanned = ({ type, data }: { type: string, data: string }) => {
+    if (hasScannedRef.current) return; // Ignore if already scanned
+    hasScannedRef.current = true;
+    setScanned(true);
+    console.log(`Scanned type: ${type}, data: ${data}`);
+    fetchProductInfo(data);
+  };
+  
+  // Add item to inventory
+  const addToInventory = async () => {
+    if (!scannedProduct) return;
+    
+    try {
+      const currentUser = FIREBASE_AUTH.currentUser;
+      if (!currentUser) {
+        alert('You must be logged in to add items');
+        return;
+      }
+      
+      // Add to Firestore
+      await addDoc(collection(FIREBASE_DB, 'inventory'), {
+        name: scannedProduct.name,
+        quantity: parseInt(quantity),
+        expirationDate: formatDate(expirationDate),
+        category: scannedProduct.categories?.split(',')[0] || 'Other',
+        userId: currentUser.uid,
+        dateAdded: new Date().toISOString(),
+        barcode: scannedProduct.barcode,
+        brand: scannedProduct.brand,
+        image: scannedProduct.image
+      });
+      
+      // Show success message
+      alert(`${scannedProduct.name} added to your inventory!`);
+      
+      // Reset and close modal
+      setModalVisible(false);
+      setScannedProduct(null);
+      setQuantity('1');
+      
+      // Allow scanning again
+      setScanned(false);
+      hasScannedRef.current = false;
+    } catch (error) {
+      console.error('Error adding to inventory:', error);
+      alert('Error adding item to inventory');
+    }
+  };
+  
+  // Cancel adding item
+  const cancelAddItem = () => {
+    setModalVisible(false);
+    setScanned(false);
+    hasScannedRef.current = false;
+  };
+
+  if (!permission) {
+    // Camera permissions are still loading
+    return <View style={styles.container}><ActivityIndicator size="large" color="#4CAF50" /></View>;
+  }
+
+  if (!permission.granted) {
+    // Camera permissions are not granted yet
     return (
-        <View style={styles.container}>
-            <CameraView style={styles.camera} facing={facing}
-                onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
-                barcodeScannerSettings={{
-                    barcodeTypes: [
-                        'ean13',
-                        'upc_a',
-                        'qr',
-                        'code128'
-                    ]
-                }}
-
-            >
-            </CameraView>
-
-            {scanned && (
-                <View style={styles.resetButton}>
-                    <Button
-                        title="Scan Again"
-                        onPress={() => {
-                            setScanned(false);
-                            hasScannedRef.current = false;
-                        }}
-                    />
-                </View>
-            )}
-
-        </View>
+      <View style={styles.container}>
+        <Text style={styles.message}>We need your permission to use the camera to scan barcodes</Text>
+        <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
+          <Text style={styles.permissionButtonText}>Grant Permission</Text>
+        </TouchableOpacity>
+      </View>
     );
+  }
 
-
-
+  return (
+    <View style={styles.container}>
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#4CAF50" />
+          <Text style={styles.loadingText}>Fetching product information...</Text>
+        </View>
+      ) : (
+        <>
+          <CameraView 
+            style={styles.camera} 
+            facing={facing}
+            onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+            barcodeScannerSettings={{
+              barcodeTypes: [
+                'ean13',
+                'upc_a',
+                'qr',
+                'code128'
+              ]
+            }}
+          >
+            <View style={styles.overlay}>
+              <View style={styles.scanBox} />
+            </View>
+          </CameraView>
+          
+          <Text style={styles.instructionText}>Position barcode within the square</Text>
+          
+          {scanned && !modalVisible && (
+            <TouchableOpacity 
+              style={styles.scanAgainButton}
+              onPress={() => {
+                setScanned(false);
+                hasScannedRef.current = false;
+              }}
+            >
+              <Text style={styles.buttonText}>Scan Again</Text>
+            </TouchableOpacity>
+          )}
+          
+          {/* Add Item Modal */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.modalTitle}>Add to Inventory</Text>
+                
+                {scannedProduct && (
+                  <View style={styles.productInfo}>
+                    <Text style={styles.productName}>{scannedProduct.name}</Text>
+                    <Text style={styles.productBrand}>{scannedProduct.brand}</Text>
+                  </View>
+                )}
+                
+                <View style={styles.formGroup}>
+                  <Text style={styles.label}>Quantity:</Text>
+                  <View style={styles.quantityContainer}>
+                    <TouchableOpacity 
+                      style={styles.quantityButton}
+                      onPress={() => setQuantity(Math.max(1, parseInt(quantity) - 1).toString())}
+                    >
+                      <Text style={styles.quantityButtonText}>-</Text>
+                    </TouchableOpacity>
+                    
+                    <TextInput
+                      style={styles.quantityInput}
+                      value={quantity}
+                      onChangeText={setQuantity}
+                      keyboardType="numeric"
+                    />
+                    
+                    <TouchableOpacity 
+                      style={styles.quantityButton}
+                      onPress={() => setQuantity((parseInt(quantity) + 1).toString())}
+                    >
+                      <Text style={styles.quantityButtonText}>+</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                
+                <View style={styles.formGroup}>
+                  <Text style={styles.label}>Expiration Date:</Text>
+                  <TouchableOpacity 
+                    style={styles.datePickerButton}
+                    onPress={() => setShowDatePicker(true)}
+                  >
+                    <Text>{formatDate(expirationDate)}</Text>
+                  </TouchableOpacity>
+                  
+                  {showDatePicker && (
+                    <DateTimePicker
+                      value={expirationDate}
+                      mode="date"
+                      display="default"
+                      onChange={onDateChange}
+                      minimumDate={new Date()}
+                    />
+                  )}
+                </View>
+                
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    style={[styles.button, styles.buttonCancel]}
+                    onPress={cancelAddItem}
+                  >
+                    <Text style={styles.textStyle}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.button, styles.buttonAdd]}
+                    onPress={addToInventory}
+                  >
+                    <Text style={styles.textStyle}>Add Item</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        </>
+      )}
+    </View>
+  );
 };
 
-
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: '#000',
+  },
+  camera: {
+    flex: 1,
+  },
+  message: {
+    textAlign: 'center',
+    paddingBottom: 20,
+    fontSize: 16,
+    color: '#333',
+    paddingHorizontal: 30,
+  },
+  permissionButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 8,
+    alignSelf: 'center',
+  },
+  permissionButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scanBox: {
+    width: 250,
+    height: 250,
+    borderWidth: 2,
+    borderColor: '#4CAF50',
+    backgroundColor: 'transparent',
+  },
+  instructionText: {
+    position: 'absolute',
+    top: 60,
+    alignSelf: 'center',
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  scanAgainButton: {
+    position: 'absolute',
+    bottom: 60,
+    alignSelf: 'center',
+    backgroundColor: '#4CAF50',
+    padding: 15,
+    borderRadius: 8,
+    width: 200,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#000',
+  },
+  loadingText: {
+    color: 'white',
+    marginTop: 20,
+    fontSize: 16,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalView: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
     },
-    message: {
-        textAlign: 'center',
-        paddingBottom: 10,
-    },
-    resetButton: {
-        position: 'absolute',
-        bottom: 40,
-        alignSelf: 'center',
-        backgroundColor: '#fff',
-        padding: 10,
-        borderRadius: 8,
-    },
-    camera: {
-        flex: 1,
-    },
-    buttonContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        backgroundColor: 'transparent',
-        margin: 64,
-    },
-    button: {
-        flex: 1,
-        alignSelf: 'flex-end',
-        alignItems: 'center',
-    },
-    text: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: 'white',
-    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  productInfo: {
+    alignItems: 'center',
+    marginBottom: 20,
+    width: '100%',
+  },
+  productName: {
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  productBrand: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 5,
+  },
+  formGroup: {
+    marginBottom: 15,
+    width: '100%',
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  quantityContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quantityButton: {
+    backgroundColor: '#4CAF50',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  quantityButtonText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  quantityInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 6,
+    padding: 8,
+    marginHorizontal: 12,
+    width: 50,
+    textAlign: 'center',
+    fontSize: 16,
+  },
+  datePickerButton: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 6,
+    padding: 12,
+    alignItems: 'center',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    marginTop: 20,
+  },
+  button: {
+    borderRadius: 8,
+    padding: 10,
+    elevation: 2,
+    minWidth: 100,
+    marginHorizontal: 10,
+  },
+  buttonAdd: {
+    backgroundColor: '#4CAF50',
+  },
+  buttonCancel: {
+    backgroundColor: '#999',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
 });
 
 export default BarcodeScanning;
