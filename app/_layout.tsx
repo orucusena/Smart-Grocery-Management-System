@@ -17,7 +17,9 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { FIREBASE_AUTH } from '@/firebaseConfig';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import HomeScreen from './(tabs)';
-
+import BarcodeScanning from './(tabs)/BarcodeScanning';
+import RecipeSuggestions from './(tabs)/RecipeSuggestions';
+import MealDetailsScreen from './(tabs)/MealDetailsScreen';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -44,11 +46,12 @@ function InsideLayout() {
       <InsideStack.Screen name="My todos" component={List} />
       <InsideStack.Screen name="Details" component={Details} />
       <InsideStack.Screen name="Inventory" component={HomeScreen} />
+      <InsideStack.Screen name="BarcodeScanning" component={BarcodeScanning} />
+      <InsideStack.Screen name="RecipeSuggestions" component={RecipeSuggestions} />
+      <InsideStack.Screen name="MealDetailsScreen" component={MealDetailsScreen} options={{ title: 'Recipe Details' }} />
     </InsideStack.Navigator>
   );
 }
-
-
 
 
 export default function RootLayout() {
@@ -96,4 +99,3 @@ export default function RootLayout() {
 
   );
 }
-
