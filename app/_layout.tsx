@@ -50,7 +50,7 @@ function InsideLayout() {
       <InsideStack.Screen name="RecipeSuggestions" component={RecipeSuggestions} />
       <InsideStack.Screen name="MealDetailsScreen" component={MealDetailsScreen} options={{ title: 'Recipe Details' }} />
     </InsideStack.Navigator>
-  );
+  );  
 }
 
 
