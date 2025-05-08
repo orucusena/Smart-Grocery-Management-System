@@ -16,10 +16,11 @@ import { useState } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { FIREBASE_AUTH } from '@/firebaseConfig';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import HomeScreen from './(tabs)';
+import Inventory from './(tabs)/Inventory';
 import BarcodeScanning from './(tabs)/BarcodeScanning';
 import RecipeSuggestions from './(tabs)/RecipeSuggestions';
 import MealDetailsScreen from './(tabs)/MealDetailsScreen';
+import ExpiringSoon from './(tabs)/ExpiringSoon';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -45,8 +46,9 @@ function InsideLayout() {
     <InsideStack.Navigator>
       <InsideStack.Screen name="My todos" component={List} />
       <InsideStack.Screen name="Details" component={Details} />
-      <InsideStack.Screen name="Inventory" component={HomeScreen} />
+      <InsideStack.Screen name="Inventory" component={Inventory} />
       <InsideStack.Screen name="BarcodeScanning" component={BarcodeScanning} />
+      <InsideStack.Screen name="ExpiringSoon" component={ExpiringSoon} />
       <InsideStack.Screen name="RecipeSuggestions" component={RecipeSuggestions} />
       <InsideStack.Screen name="MealDetailsScreen" component={MealDetailsScreen} options={{ title: 'Recipe Details' }} />
     </InsideStack.Navigator>
