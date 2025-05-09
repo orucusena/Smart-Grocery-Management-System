@@ -21,6 +21,7 @@ import BarcodeScanning from './(tabs)/BarcodeScanning';
 import RecipeSuggestions from './(tabs)/RecipeSuggestions';
 import MealDetailsScreen from './(tabs)/MealDetailsScreen';
 import ExpiringSoon from './(tabs)/ExpiringSoon';
+import FoodRecallsScreen from './(tabs)/FoodRecallsScreen';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -51,6 +52,7 @@ function InsideLayout() {
       <InsideStack.Screen name="ExpiringSoon" component={ExpiringSoon} />
       <InsideStack.Screen name="RecipeSuggestions" component={RecipeSuggestions} />
       <InsideStack.Screen name="MealDetailsScreen" component={MealDetailsScreen} options={{ title: 'Recipe Details' }} />
+      <InsideStack.Screen name="FoodRecallsScreen" component={FoodRecallsScreen} />
     </InsideStack.Navigator>
   );
 }

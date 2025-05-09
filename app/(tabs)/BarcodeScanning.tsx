@@ -19,6 +19,16 @@ const BarcodeScanning = () => {
   const [expirationDate, setExpirationDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   
+  // Category & Unit
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedUnit, setSelectedUnit] = useState('pcs');
+  const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
+  const [isUnitModalVisible, setIsUnitModalVisible] = useState(false);
+
+  //Lists for categories and units.
+  const categoryOptions = ['Vegetbales', 'Fruits', 'Dairy', 'Grains', 'Meat', 'Beverages', 'Snacks', 'Other'];
+  const unitOptions = ['pcs', 'kg', 'g', 'l', 'ml', 'oz', 'lb'];
+
   // Format date for display
   const formatDate = (date: Date) => {
     return date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
@@ -32,6 +42,7 @@ const BarcodeScanning = () => {
     }
   };
 
+  //Fetch from OpenFoodFacts API
   const fetchProductInfo = async (code: string) => {
     setLoading(true);
     try {
@@ -52,6 +63,19 @@ const BarcodeScanning = () => {
           quantity: data.product.quantity || '',
           categories: data.product.categories || '',
         };
+
+        //Match a category based on the scanned product information
+        if (data.product.categories){
+
+          const productCategories = data.product.categories.toLowerCase().split(',');
+          
+          for (const category of categoryOptions) {
+            if (productCategories.some( (pc:string) => category.toLowerCase().includes(pc.trim()) || pc.trim().includes(category.toLowerCase()))){
+              setSelectedCategory(category);
+              break;
+            }
+          }
+        }
         
         // Set scanned product and show modal
         setScannedProduct(product);
@@ -97,7 +121,7 @@ const BarcodeScanning = () => {
         name: scannedProduct.name,
         quantity: parseInt(quantity),
         expirationDate: formatDate(expirationDate),
-        category: scannedProduct.categories?.split(',')[0] || 'Other',
+        category: selectedCategory,
         userId: currentUser.uid,
         dateAdded: new Date().toISOString(),
         barcode: scannedProduct.barcode,
@@ -112,6 +136,8 @@ const BarcodeScanning = () => {
       setModalVisible(false);
       setScannedProduct(null);
       setQuantity('1');
+      setSelectedCategory('');
+      setSelectedUnit('pcs');
       
       // Allow scanning again
       setScanned(false);
@@ -232,6 +258,75 @@ const BarcodeScanning = () => {
                     </TouchableOpacity>
                   </View>
                 </View>
+
+                {/* Category Picker Modal */}
+                <View style={styles.formGroup}>
+                  <Text style={styles.label}>Category:</Text>
+                  <TouchableOpacity onPress={() => setIsCategoryModalVisible(true)} style={styles.unitPicker}>
+                    <Text style={styles.unitText}>📂 Category: {selectedCategory || 'Select'}</Text>
+                  </TouchableOpacity>
+                </View>
+                
+                {/* Unit Picker Modal */}
+                <View style={styles.formGroup}>
+                  <Text style={styles.label}>Unit:</Text>
+                  <TouchableOpacity onPress={() => setIsUnitModalVisible(true)} style={styles.unitPicker}>
+                    <Text style={styles.unitText}>📏 Unit: {selectedUnit}</Text>
+                  </TouchableOpacity>
+                </View>
+                
+                {/* Category Modal */}
+                <Modal 
+                  visible={isCategoryModalVisible} 
+                  transparent 
+                  animationType="slide" 
+                  onRequestClose={() => setIsCategoryModalVisible(false)}
+                >
+                  <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                      {categoryOptions.map(opt => (
+                        <TouchableOpacity key={opt} onPress={() => {
+                          setSelectedCategory(opt);
+                          setIsCategoryModalVisible(false);
+                        }} style={styles.modalItem}>
+                          <Text style={styles.modalItemText}>{opt}</Text>
+                        </TouchableOpacity>
+                      ))}
+                      <TouchableOpacity onPress={() => setIsCategoryModalVisible(false)}>
+                        <Text style={styles.modalCancel}>Cancel</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </Modal>
+                
+                {/* Unit Modal */}
+                <Modal
+                  visible={isUnitModalVisible}
+                  transparent
+                  animationType="slide"
+                  onRequestClose={() => setIsUnitModalVisible(false)}
+                >
+                  <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                      {unitOptions.map((opt) => (
+                        <TouchableOpacity
+                          key={opt}
+                          onPress={() => {
+                            setSelectedUnit(opt);
+                            setIsUnitModalVisible(false);
+                          }}
+                          style={styles.modalItem}
+                        >
+                          <Text style={styles.modalItemText}>{opt}</Text>
+                        </TouchableOpacity>
+                      ))}
+                      <TouchableOpacity onPress={() => setIsUnitModalVisible(false)}>
+                        <Text style={styles.modalCancel}>Cancel</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </Modal>
+                
                 
                 <View style={styles.formGroup}>
                   <Text style={styles.label}>Expiration Date:</Text>
@@ -456,6 +551,45 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  // Styles matching Inventory page
+  unitPicker: {
+    padding: 12,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginVertical: 5,
+    alignItems: 'center',
+  },
+  unitText: {
+    fontSize: 16,
+    color: '#555',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingHorizontal: 40,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalItem: {
+    paddingVertical: 12,
+    width: '100%',
+    alignItems: 'center',
+  },
+  modalItemText: {
+    fontSize: 18,
+  },
+  modalCancel: {
+    marginTop: 20,
+    color: 'red',
+    fontSize: 16,
   },
 });
 
