@@ -1,312 +1,195 @@
-import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, Text, Alert, StyleSheet, ScrollView, TouchableOpacity, Platform, Modal, } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { addInventoryItem, getInventoryItems, updateInventoryItem, deleteInventoryItem, checkForExpiredItems, } from '@/firestore';
+import React, { useEffect, useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { FIREBASE_DB, FIREBASE_AUTH } from '@/firebaseConfig';
+import { MaterialIcons, Entypo } from '@expo/vector-icons';
+import { deleteInventoryItem } from '@/firestore';
+import { RefreshControl } from 'react-native';
+import type { InventoryItem } from '@/types';
 
-type InventoryItem = {
-  id: string;
-  name: string;
-  quantity: number;
-  unit: string;
-  category: string;
-  expirationDate: string;
+
+const getUrgencyColor = (days: number) => {
+  if (days <= 1) return '#ff4d4d';
+  if (days <= 3) return '#ff9933';
+  if (days <= 7) return '#ffd633';
+  return '#91b38e';
 };
 
-const Inventory = () => {
-  const [name, setName] = useState('');
-  const [quantity, setQuantity] = useState('');
-  const [unit, setUnit] = useState('pcs');
-  const [category, setCategory] = useState('');
-  const [expirationDate, setExpirationDate] = useState(new Date());
-  const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
-  const [isUnitModalVisible, setIsUnitModalVisible] = useState(false);
+export default function Inventory() {
   const [items, setItems] = useState<InventoryItem[]>([]);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
-  
-  const categoryOptions = ['Vegetables', 'Fruits', 'Dairy', 'Grains', 'Meat', 'Beverages', 'Snacks', 'Other'];
-  const unitOptions = ['pcs', 'kg', 'g', 'l', 'ml', 'oz', 'lb'];
+  const navigation = useNavigation<NavigationProp<any>>();
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    fetchInventory();
-    checkForExpiredItems();
-  }, []);
 
-  const fetchInventory = async () => {
-    const data = await getInventoryItems();
-    setItems(data as InventoryItem[]);
+  const fetchItems = async () => {
+    try {
+      const user = FIREBASE_AUTH.currentUser;
+      if (!user) return;
+
+      const q = query(collection(FIREBASE_DB, 'inventory'), where('userId', '==', user.uid));
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as InventoryItem));
+      setItems(data);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to fetch inventory.');
+  }
+};
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchItems();  
+    setRefreshing(false);
   };
 
-  const handleAddOrUpdateItem = async () => {
-    if (!name || !quantity || !category || !expirationDate || !unit) {
-      Alert.alert('Error', 'Please fill all fields!');
-      return;
-    }
 
-    const formattedDate = expirationDate.toISOString().split('T')[0];
+  useEffect(() => {
+    fetchItems();
+  }, []);
 
+  const handleDelete = async (itemId: string) => {
     try {
-      if (editingId) {
-        await updateInventoryItem(editingId, {
-          name,
-          quantity: parseInt(quantity),
-          unit,
-          category,
-          expirationDate: formattedDate,
-        });
-        Alert.alert('Success', 'Item updated successfully!');
-        setEditingId(null);
-      } else {
-        await addInventoryItem(name, parseInt(quantity), unit, category, formattedDate);
-        Alert.alert('Success', 'Item added successfully!');
-      }
-
-      setName('');
-      setQuantity('');
-      setUnit('pcs');
-      setCategory('');
-      setExpirationDate(new Date());
-      fetchInventory();
+      await deleteInventoryItem(itemId);
+      fetchItems(); 
     } catch (error) {
-      console.error('Error adding/updating item:', error);
-      Alert.alert('Error', 'Failed to save item. Please try again.');
+      Alert.alert('Error', 'Something went wrong while deleting the item. Please try again.');
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>{editingId ? '✏️ Edit Inventory Item' : '➕ Add Inventory Item'}</Text>
-      <TextInput style={styles.input} placeholder="Item Name" value={name} onChangeText={setName} />
-      <TextInput
-        style={styles.input}
-        placeholder="Quantity"
-        value={quantity}
-        onChangeText={setQuantity}
-        keyboardType="numeric"
-      />
-
-      {/* Category Picker Modal */}
-      <TouchableOpacity onPress={() => setIsCategoryModalVisible(true)} style={styles.unitPicker}>
-        <Text style={styles.unitText}>📂 Category: {category || 'Select'}</Text>
-      </TouchableOpacity>
-      <Modal visible={isCategoryModalVisible} transparent animationType="slide" onRequestClose={() => setIsCategoryModalVisible(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            {categoryOptions.map(opt => (
-              <TouchableOpacity key={opt} onPress={() => {
-                setCategory(opt);
-                setIsCategoryModalVisible(false);
-              }} style={styles.modalItem}>
-                <Text style={styles.modalItemText}>{opt}</Text>
-              </TouchableOpacity>
-            ))}
-            <TouchableOpacity onPress={() => setIsCategoryModalVisible(false)}>
-              <Text style={styles.modalCancel}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    
-
-      {/* Modal-style unit picker */}
-      <TouchableOpacity onPress={() => setIsUnitModalVisible(true)} style={styles.unitPicker}>
-        <Text style={styles.unitText}>📏 Unit: {unit}</Text>
-      </TouchableOpacity>
-
-      <Modal
-        visible={isUnitModalVisible}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setIsUnitModalVisible(false)}
+    <View style={styles.container}>
+      <Text style={styles.title}>My Inventory</Text>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            {unitOptions.map((opt) => (
-              <TouchableOpacity
-                key={opt}
-                onPress={() => {
-                  setUnit(opt);
-                  setIsUnitModalVisible(false);
-                }}
-                style={styles.modalItem}
-              >
-                <Text style={styles.modalItemText}>{opt}</Text>
-              </TouchableOpacity>
-            ))}
-            <TouchableOpacity onPress={() => setIsUnitModalVisible(false)}>
-              <Text style={styles.modalCancel}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+        {items.length === 0 && (
+          <Text style={{ textAlign: 'center', marginTop: 20, color: '#777' }}>
+            No inventory items yet. Tap + to add one!
+          </Text>
+        )}
 
-      {/* Date Picker */}
-      <TouchableOpacity onPress={() => setIsDatePickerVisible(true)} style={styles.datePicker}>
-        <Text style={styles.dateText}>📅 {expirationDate.toDateString()}</Text>
-      </TouchableOpacity>
-
-      {isDatePickerVisible && (
-        <DateTimePicker
-          value={expirationDate}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={(event, selectedDate) => {
-            setIsDatePickerVisible(false);
-            if (selectedDate) {
-              setExpirationDate(selectedDate);
-            }
-          }}
-        />
-      )}
-
-      <Button title={editingId ? 'Update Item' : 'Add Item'} onPress={handleAddOrUpdateItem} />
-
-      <Text style={styles.subtitle}>📦 Inventory List:</Text>
-      {items.length > 0 ? (
-        items.map((item) => (
-          <View key={item.id} style={styles.itemContainer}>
-            <Text style={styles.itemName}>🛒 {item.name}</Text>
-            <Text style={styles.itemDetail}>📌 {item.category}</Text>
-            <Text style={styles.itemDetail}>📆 {item.expirationDate}</Text>
-            <Text style={styles.itemDetail}>🔢 {item.quantity} {item.unit}</Text>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                onPress={() => {
-                  setEditingId(item.id);
-                  setName(item.name);
-                  setQuantity(item.quantity.toString());
-                  setCategory(item.category);
-                  setExpirationDate(new Date(item.expirationDate));
-                  setUnit(item.unit || 'pcs');
-                }}
-              >
-                <Text style={styles.editButton}>✏️ Edit</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => deleteInventoryItem(item.id)}>
-                <Text style={styles.deleteButton}>🗑️ Delete</Text>
-              </TouchableOpacity>
+        {items.map(item => {
+          const daysLeft = Math.ceil(
+            (new Date(item.expirationDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+          );
+          const borderColor = getUrgencyColor(daysLeft);
+  
+          return (
+            <View key={item.id} style={[styles.card, { borderLeftColor: borderColor }]}>
+              <Text style={styles.itemName}>
+                <MaterialIcons name="shopping-cart" size={16} color= "#91b38e" /> {item.name}
+              </Text>
+              <Text style={styles.itemDetail}>
+                <MaterialIcons name="category" size={16} color="#888" /> {item.category}
+              </Text>
+              <Text style={styles.itemDetail}>
+                <MaterialIcons name="event" size={16} color="#888" /> {item.expirationDate}
+              </Text>
+              <Text style={styles.itemDetail}>
+                <Entypo name="calculator" size={16} color="#888" /> {item.quantity} {item.unit}
+              </Text>
+              <Text style={[styles.expireText, { color: borderColor }]}>
+                {daysLeft <= 0 ? 'Expired' : `${daysLeft} day(s) left`}
+              </Text>
+  
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.editButton]}
+                  onPress={() => navigation.navigate('AddItem', { editId: item.id })}
+                >
+                  <Text style={styles.actionButtonText}>Edit</Text>
+                </TouchableOpacity>
+  
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.deleteButton]}
+                  onPress={() => handleDelete(item.id)}
+                >
+                  <Text style={styles.actionButtonText}>Delete</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        ))
-      ) : (
-        <Text style={styles.errorText}>No items in inventory.</Text>
-      )}
-    </ScrollView>
+          );
+        })}
+      </ScrollView>
+
+      <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate('AddItem')}>
+        <MaterialIcons name="add" size={32} color="#FFFFFF" />
+      </TouchableOpacity>
+    </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  container: { 
-    padding: 20, 
-    backgroundColor: '#f8f9fa' 
+  container: {
+    flex: 1,
+    backgroundColor: '#f4f4f4',
+    padding: 20,
   },
-  title: { 
-    fontSize: 24, 
-    fontWeight: 'bold', 
-    marginBottom: 15, 
-    textAlign: 'center', 
-    color: '#333' 
+  scrollContainer: {
+    paddingBottom: 100,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 10,
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  card: {
     backgroundColor: '#fff',
-  },
-  unitPicker: {
-    padding: 12,
-    backgroundColor: '#fff',
+    padding: 16,
+    marginBottom: 15,
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    marginBottom: 10,
-    alignItems: 'center',
+    elevation: 2,
+    borderLeftWidth: 6,
+    gap: 4,
   },
-  unitText: {
+  itemName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  itemDetail: {
     fontSize: 16,
     color: '#555',
   },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    paddingHorizontal: 40,
+  expireText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginTop: 6,
   },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-    alignItems: 'center',
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 10,
+    marginTop: 12,
   },
-  modalItem: {
-    paddingVertical: 12,
-    width: '100%',
-    alignItems: 'center',
-  },
-  modalItemText: {
-    fontSize: 18,
-  },
-  modalCancel: {
-    marginTop: 20,
-    color: 'red',
-    fontSize: 16,
-  },
-  datePicker: {
-    padding: 10,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  dateText: { 
-    fontSize: 16, 
-    color: '#555' 
-  },
-  itemContainer: {
-    backgroundColor: '#fff',
-    padding: 15,
-    marginBottom: 10,
+  actionButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 16,
     borderRadius: 8,
-    elevation: 3,
   },
-  itemName: { 
-    fontSize: 18, 
-    fontWeight: 'bold', 
-    color: '#333' 
+  editButton: {
+    backgroundColor: '#91b38e',
   },
-  itemDetail: { 
-    fontSize: 16, 
-    color: '#555', 
-    marginTop: 3 
+  deleteButton: {
+    backgroundColor: '#5a855f',
   },
-  buttonContainer: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    marginTop: 10 
+  actionButtonText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
   },
-  editButton: { 
-    color: 'blue', 
-    fontWeight: 'bold', 
-    marginRight: 10 
-  },
-  deleteButton: { 
-    color: 'red', 
-    fontWeight: 'bold' 
-  },
-  subtitle: { 
-    fontSize: 20, 
-    marginVertical: 15, 
-    textAlign: 'center' 
-  },
-  errorText: { 
-    fontSize: 18, 
-    color: 'red', 
-    textAlign: 'center' 
+  fab: {
+    position: 'absolute',
+    right: 25,
+    bottom: 25,
+    backgroundColor: '#91b38e',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 5,
   },
 });
-
-export default Inventory;
