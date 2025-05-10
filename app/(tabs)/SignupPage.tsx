@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TextInput, ActivityIndicator, Button, KeyboardAvoidingView } from 'react-native'
 import React, { useState } from 'react';
 import { FIREBASE_AUTH } from '@/firebaseConfig'; 
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { TouchableOpacity } from "react-native";
 import { NavigationProp } from '@react-navigation/native';
 
@@ -22,16 +22,20 @@ const SignupPage = ({ navigation }: RouterProps) => {
     const signUp = async () => {
         setLoading(true);
         try {
-            const response = await createUserWithEmailAndPassword(auth, email, password);
-            console.log(response);
-            alert('Check your emails!');
+          const response = await createUserWithEmailAndPassword(auth, email, password);
+          if (auth.currentUser) {
+            await updateProfile(auth.currentUser, {
+              displayName: `${fname} ${lname}`.trim(),
+            });
+          }
+          alert('Account created! Please check your email.');
         } catch (error: any) {
-            console.log(error);
-            alert('Sign in failed!' + error.message);
+          console.error(error);
+          alert('Sign up failed: ' + error.message);
         } finally {
-            setLoading(false);
+          setLoading(false);
         }
-    }
+      };      
 
     const fnameToNextScreen = () => {
         // Navigate to the next screen and pass `fname` as a parameter
