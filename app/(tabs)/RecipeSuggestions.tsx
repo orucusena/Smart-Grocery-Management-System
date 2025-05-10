@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, ActivityIndicator, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, ImageBackground, TouchableOpacity, StyleSheet } from 'react-native';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
-import { FIREBASE_DB, FIREBASE_AUTH } from '@/firebaseConfig'; 
+import { FIREBASE_DB, FIREBASE_AUTH } from '@/firebaseConfig';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 
 type Meal = {
@@ -11,7 +11,7 @@ type Meal = {
   strMealThumb: string;
 };
 
-const RecipeSuggestions = () => {
+export default function RecipeSuggestions() {
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation<NavigationProp<any>>();
@@ -29,7 +29,9 @@ const RecipeSuggestions = () => {
       let allMeals: Meal[] = [];
 
       for (const ingredient of ingredients) {
-        const response = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${ingredient}`);
+        const response = await fetch(
+          `https://www.themealdb.com/api/json/v1/1/filter.php?i=${ingredient}`
+        );
         const data = await response.json();
         if (data.meals) {
           allMeals = [...allMeals, ...data.meals];
@@ -57,51 +59,81 @@ const RecipeSuggestions = () => {
     return () => unsubscribe();
   }, []);
 
-  if (loading) return <ActivityIndicator style={{ marginTop: 40 }} size="large" />;
-  if (meals.length === 0) return <Text style={styles.emptyText}>No meal suggestions found!</Text>;
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#4CAF50" />
+      </View>
+    );
+  }
+
+  if (meals.length === 0) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.emptyText}>No meal suggestions found based on your inventory!</Text>
+      </View>
+    );
+  }
 
   return (
     <FlatList
       data={meals}
       keyExtractor={(item) => item.idMeal}
       renderItem={({ item }) => (
-        <TouchableOpacity onPress={() => navigation.navigate('MealDetailsScreen', { mealId: item.idMeal })}>
-          <View style={styles.card}>
-            <Image source={{ uri: item.strMealThumb }} style={styles.image} />
-            <Text style={styles.title}>{item.strMeal}</Text>
-          </View>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('MealDetailsScreen', { mealId: item.idMeal })}
+        >
+          <ImageBackground
+            source={{ uri: item.strMealThumb }}
+            style={styles.card}
+            imageStyle={styles.image}
+          >
+            <View style={styles.overlay}>
+              <Text style={styles.mealName}>{item.strMeal}</Text>
+            </View>
+          </ImageBackground>
         </TouchableOpacity>
       )}
+      contentContainerStyle={{ 
+        paddingVertical: 12, 
+        backgroundColor: '#fff'
+      }}
     />
   );
-};
+}
 
 const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
   card: {
-    padding: 10,
-    backgroundColor: '#fff',
-    marginVertical: 8,
+    height: 200,
     marginHorizontal: 16,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
+    marginBottom: 16,
+    borderRadius: 12,
+    overflow: 'hidden',
     elevation: 3,
   },
   image: {
-    height: 200,
-    borderRadius: 10,
+    borderRadius: 12,
   },
-  title: {
+  overlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    padding: 12,
+  },
+  mealName: {
+    color: '#fff',
     fontSize: 18,
-    marginTop: 10,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   emptyText: {
-    textAlign: 'center',
-    marginTop: 40,
     fontSize: 16,
+    color: '#555',
+    textAlign: 'center',
   },
 });
-
-export default RecipeSuggestions;
