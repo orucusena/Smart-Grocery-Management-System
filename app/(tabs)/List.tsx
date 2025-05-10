@@ -14,11 +14,13 @@ const List = ({ navigation }: RouterProps) => {
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <Text>Welcome back</Text>
             <Button onPress={() => navigation.navigate('Details')} title="Open Details" />
-            <Button onPress={() => navigation.navigate('Inventory')} title="Inventory Management" />
+            <Button onPress={() => navigation.navigate('Inventory')} title="My Inventory" />
+            <Button onPress={() => navigation.navigate('AddItem')} title="Add Item" />
             <Button onPress={() => navigation.navigate('BarcodeScanning')} title="Scan" />
             <Button onPress={() => navigation.navigate('ExpiringSoon')} title="Expiring Soon" />
             <Button onPress={() => navigation.navigate('RecipeSuggestions')} title="Recipe Suggestions" />
             <Button onPress={() => navigation.navigate('FoodRecallsScreen')} title="Food Recalls" />
+            <Button onPress={() => navigation.navigate('MyProfile')} title="My Profile" />
             <Button onPress={() => FIREBASE_AUTH.signOut()} title="Logout" />
         </View>
     );
