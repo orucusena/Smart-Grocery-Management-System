@@ -18,6 +18,7 @@ const List = ({ navigation }: RouterProps) => {
             <Button onPress={() => navigation.navigate('BarcodeScanning')} title="Scan" />
             <Button onPress={() => navigation.navigate('ExpiringSoon')} title="Expiring Soon" />
             <Button onPress={() => navigation.navigate('RecipeSuggestions')} title="Recipe Suggestions" />
+            <Button onPress={() => navigation.navigate('FoodRecallsScreen')} title="Food Recalls" />
             <Button onPress={() => FIREBASE_AUTH.signOut()} title="Logout" />
         </View>
     );
