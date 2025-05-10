@@ -1,5 +1,4 @@
-import { View, Text, StyleSheet, Button, TouchableOpacity, SafeAreaView, StatusBar, Image } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar, Image } from 'react-native'
 import { NavigationProp } from '@react-navigation/native';
 
 
@@ -10,11 +9,11 @@ interface RouterProps {
 const WelcomePage = ({ navigation }: RouterProps) => {
     return (
         <View style={styles.container}>
-            <StatusBar barStyle="light-content" /*backgroundColor="#FFDE59"*/ backgroundColor="#91b38e"/>
+            <StatusBar barStyle="light-content" backgroundColor="#FFDE59"/>
             
             <SafeAreaView style={styles.topSection}>
             <View style={styles.logoContainer}>
-                <Image source={require('@/UI/logo4_green.png')} style={styles.logoImage} resizeMode="contain"/>
+                <Image source={require('@/UI/logo4_3.png')} style={styles.logoImage} resizeMode="contain"/>
             </View>
             </SafeAreaView>
 
@@ -44,15 +43,13 @@ const styles = StyleSheet.create({
     
     container: {
     flex: 1,
-    //backgroundColor: '#FFDE59',
-    backgroundColor: '#91b38e',
+    backgroundColor: '#FFDE59',
   },
   topSection: {
     height: '40%',
     justifyContent: 'center',
     alignItems: 'center',
-    //backgroundColor: '#FFDE59',
-    backgroundColor: '#91b38e',
+    backgroundColor: '#FFDE59',
   },
   bottomSection: {
     flex: 1,
@@ -101,8 +98,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   primaryButton: {
-    //backgroundColor: '#FFDE59', // Pop of color
-    backgroundColor: '#91b38e',
+    backgroundColor: '#FFDE59',
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -118,9 +114,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
-    //borderWidth: 1,
-    //borderColor: '#E0E0E0',
-    backgroundColor: '#5a855f',
+    backgroundColor: '#fffc00',
     width: '60%',
   },
   secondaryButtonText: {

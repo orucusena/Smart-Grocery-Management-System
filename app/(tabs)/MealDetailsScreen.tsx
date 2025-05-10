@@ -103,19 +103,21 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontFamily: 'Quicksand_700Bold',
     marginBottom: 12,
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: '600',
     marginTop: 16,
     marginBottom: 8,
+    fontFamily: 'Quicksand_700Bold',
+    backgroundColor: '#FFDE59',
   },
   text: {
     fontSize: 16,
     marginBottom: 4,
+    fontFamily: 'Quicksand_400Regular'
   },
   link: {
     color: '#1e90ff',
@@ -126,6 +128,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 40,
     fontSize: 16,
+    fontFamily: 'Quicksand_400Regular'
   },
 });
 

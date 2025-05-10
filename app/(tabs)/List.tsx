@@ -1,10 +1,10 @@
-import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, StatusBar,StyleSheet, Button, Modal } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StatusBar,StyleSheet, Modal } from 'react-native';
 import { useFonts, Quicksand_400Regular, Quicksand_700Bold } from '@expo-google-fonts/quicksand';
 import React, { useState } from 'react'
 import { NavigationProp, useFocusEffect } from '@react-navigation/native';
 import { FIREBASE_AUTH,FIREBASE_DB } from '@/firebaseConfig'; 
 import { collection, getDocs, query, where, orderBy, limit } from 'firebase/firestore';
-import { MaterialIcons, Entypo } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -93,12 +93,8 @@ const List = ({ navigation }: RouterProps) => {
       }) as InventoryItem);
       setRecentItems(recentItemsList);
     } catch (error) {
-      // If you don't have a createdAt field or orderBy isn't working:
-      // Just get the most recent 5 items from allItems
       const sortedItems = [...allItems].sort((a, b) => {
-        // This is a fallback sorting if you don't have timestamps
-        // You might want to use some other logic depending on your data structure
-        return b.id.localeCompare(a.id); // Assuming newer items have "larger" IDs
+        return b.id.localeCompare(a.id);
       });
       setRecentItems(sortedItems.slice(0, 5));
     }
@@ -139,7 +135,7 @@ const List = ({ navigation }: RouterProps) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" /*backgroundColor="#FFDE59"*/ backgroundColor="#91b38e" />
+      <StatusBar barStyle="light-content" backgroundColor="#FFDE59" />
 
       <View style={styles.topSection}>
         <View style={styles.headerRow}>
@@ -148,7 +144,7 @@ const List = ({ navigation }: RouterProps) => {
           </View>
           <TouchableOpacity 
             style={styles.profileButton}
-            onPress={() => navigation.navigate('Details')}>
+            onPress={() => navigation.navigate('MyProfile')}>
             <MaterialIcons name="person" size={50} color="#fff" />
           </TouchableOpacity>
         </View>
@@ -242,7 +238,6 @@ const List = ({ navigation }: RouterProps) => {
   )}
 </View>
         </View>
-        <Button onPress={() => FIREBASE_AUTH.signOut()} title="Logout" />
       </ScrollView>
       
     {/* Bottom Navigation */}
@@ -251,7 +246,7 @@ const List = ({ navigation }: RouterProps) => {
     style={styles.navItem} 
     onPress={() => navigation.navigate('Dashboard')}
   >
-    <MaterialIcons name="home" size={24} /*color="#FFDE59"*/ color="#91b38e" />
+    <MaterialIcons name="home" size={24} />
     <Text style={styles.navText}>Home</Text>
   </TouchableOpacity>
   
@@ -318,7 +313,7 @@ const List = ({ navigation }: RouterProps) => {
         style={styles.addOption}
         onPress={() => {
           setAddMenuVisible(false);
-          navigation.navigate('Inventory', { screen: 'AddManually' });
+          navigation.navigate('AddItem', { screen: 'AddManually' });
         }}
       >
         <MaterialIcons name="edit" size={28} color="#333" />
@@ -340,8 +335,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8F8F8',
   },
   topSection: {
-    //backgroundColor: '#FFDE59',
-    backgroundColor: '#91b38e',
+    backgroundColor: '#FFDE59',
     paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 50,
@@ -355,11 +349,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Quicksand_700Bold',
     fontSize: 30,
     color: '#000',
-  },
-  nameText: {
-    fontFamily: 'Quicksand_700Bold',
-    fontSize: 24,
-    color: '#FFF',
   },
   profileButton: {
     width: 80,
@@ -404,7 +393,7 @@ const styles = StyleSheet.create({
   },
   contentInner: {
     padding: 16,
-    paddingBottom: 80, // Space for bottom navigation
+    paddingBottom: 80, 
   },
   card: {
     backgroundColor: '#FFF',
@@ -431,16 +420,12 @@ const styles = StyleSheet.create({
   viewAllText: {
     fontFamily: 'Quicksand_700Bold',
     fontSize: 12,
-    //color: '#000',
-    //color: '#FFDE59',
-    color: '#91b38e',
+    color: '#FFDE59',
   },
   viewAllTextStats: {
     fontFamily: 'Quicksand_700Bold',
     fontSize: 12,
-    //color: '#000',
-    //color: '#FFDE59',
-    color: '#91b38e',
+    color: '#FFDE59',
     paddingTop: 10,
   },
   expiringItemsContainer: {
@@ -578,8 +563,7 @@ addButton: {
   justifyContent: 'center',
 },
 addButtonInner: {
-  //backgroundColor: '#FFDE59',
-  backgroundColor: '#91b38e',
+  backgroundColor: '#FFDE59',
   width: 56,
   height: 56,
   borderRadius: 28,
@@ -603,7 +587,7 @@ addOptionsContainer: {
   borderTopLeftRadius: 20,
   borderTopRightRadius: 20,
   width: '100%',
-  paddingBottom: 90, // Space for the bottom nav
+  paddingBottom: 90, 
   paddingTop: 20,
 },
 addOption: {

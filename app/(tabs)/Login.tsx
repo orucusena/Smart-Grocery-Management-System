@@ -1,10 +1,9 @@
 import { View, Text, StyleSheet, TextInput, ActivityIndicator, TouchableOpacity, KeyboardAvoidingView, StatusBar } from 'react-native'
 import React, { useState } from 'react'
-import { FIREBASE_AUTH, FIREBASE_DB } from '@/firebaseConfig'; 
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { FIREBASE_AUTH} from '@/firebaseConfig'; 
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { NavigationProp } from '@react-navigation/native';
 import { useFonts, Quicksand_400Regular, Quicksand_700Bold } from '@expo-google-fonts/quicksand';
-import { doc, getDoc } from "firebase/firestore";
 
 
 interface RouterProps {
@@ -41,7 +40,7 @@ const Login = ({ navigation }: RouterProps) => {
   return (
     <View style={styles.container}>
 
-      <StatusBar barStyle="light-content" /*backgroundColor="#FFDE59"*/ backgroundColor="#91b38e"/>
+      <StatusBar barStyle="light-content" backgroundColor="#FFDE59"/>
       <View style={styles.topSection}>
         <Text style={styles.topSectionText}>LOGIN</Text>
       </View>
@@ -57,7 +56,7 @@ const Login = ({ navigation }: RouterProps) => {
         <TextInput secureTextEntry={true} value={password} style={styles.input} placeholder="Password" autoCapitalize="none" onChangeText={(text) => setPassword(text)}></TextInput>
 
         <View style={styles.buttonContainer}>
-        {loading ? <ActivityIndicator size="large" /*color="#FFDE59"*/ color="#91b38e" />
+        {loading ? <ActivityIndicator size="large" color="#FFDE59" />
           : <>
             <TouchableOpacity style={styles.button} onPress={signIn}>
               <Text style={styles.buttonText}>Login</Text>
@@ -84,8 +83,7 @@ export default Login;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    //backgroundColor: '#FFDE59',
-    backgroundColor: '#91b38e',
+    backgroundColor: '#FFDE59',
   },
   input: {
     marginVertical: 10,
@@ -99,8 +97,7 @@ const styles = StyleSheet.create({
     height: '25%',
     justifyContent: 'center',
     alignItems: 'center',
-    //backgroundColor: '#FFDE59',
-    backgroundColor: '#91b38e',
+    backgroundColor: '#FFDE59',
   },
   bottomSection: {
     flex: 1,
@@ -124,8 +121,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 30,
   },
   button: {
-    //backgroundColor: '#FFDE59', // Pop of color
-    backgroundColor: '#91b38e',
+    backgroundColor: '#FFDE59',
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -152,8 +148,7 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   signupText: {
-    //color: '#FFDE59',
-    color: '#91b38e',
+    color: '#FFDE59',
     textDecorationLine: 'underline',
   }
 });

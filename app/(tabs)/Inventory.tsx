@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, Modal } from 'react-native';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { FIREBASE_DB, FIREBASE_AUTH } from '@/firebaseConfig';
@@ -20,6 +20,9 @@ export default function Inventory() {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const navigation = useNavigation<NavigationProp<any>>();
   const [refreshing, setRefreshing] = useState(false);
+
+  const [addMenuVisible, setAddMenuVisible] = useState(false);
+      
 
 
   const fetchItems = async () => {
@@ -115,9 +118,89 @@ export default function Inventory() {
         })}
       </ScrollView>
 
-      <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate('AddItem')}>
-        <MaterialIcons name="add" size={32} color="#FFFFFF" />
-      </TouchableOpacity>
+          {/* Bottom Navigation */}
+      <View style={styles.bottomNavigation}>
+        <TouchableOpacity 
+          style={styles.navItem} 
+          onPress={() => navigation.navigate('Dashboard')}
+        >
+          <MaterialIcons name="home" size={24} />
+          <Text style={styles.navText}>Home</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => navigation.navigate('Inventory')}
+        >
+          <MaterialIcons name="list" size={24} color="#777" />
+          <Text style={styles.navText}>Inventory</Text>
+        </TouchableOpacity>
+        
+         <TouchableOpacity
+          style={[styles.addButton, styles.navItem]}
+          onPress={() => setAddMenuVisible(true)}
+        >
+          <View style={styles.addButtonInner}>
+            <MaterialIcons name="add" size={32} color="#FFF" />
+          </View>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => navigation.navigate('FoodRecallsScreen')}>
+          <MaterialIcons name="report-problem" size={24} color="#777" />
+          <Text style={styles.navText}>Recalls</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => navigation.navigate('RecipeSuggestions')}
+        >
+          <MaterialIcons name="restaurant" size={24} color="#777" />
+          <Text style={styles.navText}>Recipes</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Add Options Modal */}
+      <Modal
+        transparent={true}
+        visible={addMenuVisible}
+        animationType="fade"
+        onRequestClose={() => setAddMenuVisible(false)}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlayNav}
+          activeOpacity={1}
+          onPress={() => setAddMenuVisible(false)}
+        >
+          <View style={styles.addOptionsContainer}>
+            <TouchableOpacity
+              style={styles.addOption}
+              onPress={() => {
+                setAddMenuVisible(false);
+                navigation.navigate('BarcodeScanning');
+              }}
+            >
+              <MaterialIcons name="qr-code-scanner" size={28} color="#333" />
+              <Text style={styles.addOptionText}>Scan Barcode</Text>
+            </TouchableOpacity>
+            
+            <View style={styles.optionDivider} />
+            
+            <TouchableOpacity
+              style={styles.addOption}
+              onPress={() => {
+                setAddMenuVisible(false);
+                navigation.navigate('AddItem', { screen: 'AddManually' });
+              }}
+            >
+              <MaterialIcons name="edit" size={28} color="#333" />
+              <Text style={styles.addOptionText}>Add Manually</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
     </View>
   );
 }
@@ -127,13 +210,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f4f4f4',
     padding: 20,
+    marginTop: '20%',
   },
   scrollContainer: {
     paddingBottom: 100,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontFamily: 'Quicksand_700Bold',
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -171,20 +255,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   editButton: {
-    backgroundColor: '#91b38e',
+    backgroundColor: '#FFDE59',
   },
   deleteButton: {
-    backgroundColor: '#5a855f',
+    backgroundColor: '#fffc00',
   },
   actionButtonText: {
-    color: '#FFFFFF',
+    color: '#000',
     fontWeight: 'bold',
   },
   fab: {
     position: 'absolute',
     right: 25,
     bottom: 25,
-    backgroundColor: '#91b38e',
+    backgroundColor: '#FFDE59',
     width: 60,
     height: 60,
     borderRadius: 30,
@@ -192,4 +276,84 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     elevation: 5,
   },
+  bottomNavigation: {
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  right: 0,
+  height: 70,
+  backgroundColor: '#FFF',
+  flexDirection: 'row',
+  justifyContent: 'space-around',
+  alignItems: 'center',
+  borderTopWidth: 1,
+  borderTopColor: '#ECECEC',
+  paddingHorizontal: 10,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: -2 },
+  shadowOpacity: 0.05,
+  shadowRadius: 3,
+  elevation: 5,
+},
+navItem: {
+  alignItems: 'center',
+  justifyContent: 'center',
+  flex: 1,
+},
+navText: {
+  fontFamily: 'Quicksand_400Regular',
+  fontSize: 12,
+  marginTop: 4,
+  color: '#777',
+},
+modalOverlayNav: {
+  flex: 1,
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  justifyContent: 'flex-end',
+  alignItems: 'center',
+},
+addButton: {
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+addButtonInner: {
+  backgroundColor: '#FFDE59',
+  width: 56,
+  height: 56,
+  borderRadius: 28,
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginBottom: 25,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.2,
+  shadowRadius: 3,
+  elevation: 3,
+},
+addOptionsContainer: {
+  backgroundColor: 'white',
+  borderTopLeftRadius: 20,
+  borderTopRightRadius: 20,
+  width: '100%',
+  paddingBottom: 90,
+  paddingTop: 20,
+},
+addOption: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  padding: 16,
+  paddingHorizontal: 25,
+},
+addOptionText: {
+  fontSize: 16,
+  marginLeft: 15,
+  fontWeight: '500',
+  color: '#333',
+},
+optionDivider: {
+  height: 1,
+  backgroundColor: '#eee',
+  marginHorizontal: 15,
+},
+
 });

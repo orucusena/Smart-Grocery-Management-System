@@ -173,7 +173,7 @@ const BarcodeScanning = () => {
     );
   }
 
-  return (
+  return ( 
     <View style={styles.container}>
       {loading ? (
         <View style={styles.loadingContainer}>
@@ -209,7 +209,7 @@ const BarcodeScanning = () => {
             </TouchableOpacity>
           )}
           
-          {/* Add Item Modal */}
+          {/*Add Item Modal */}
           <Modal
             animationType="slide"
             transparent={true}
@@ -408,8 +408,7 @@ const styles = StyleSheet.create({
     width: 250,
     height: 250,
     borderWidth: 2,
-    //borderColor: '#4CAF50',
-    borderColor: '#91b38e',
+    borderColor: '#FFDE59',
     backgroundColor: 'transparent',
   },
   instructionText: {
@@ -426,8 +425,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 60,
     alignSelf: 'center',
-    //backgroundColor: '#4CAF50',
-    backgroundColor:'#91b38e',
+    backgroundColor:'#FFDE59',
     padding: 15,
     borderRadius: 8,
     width: 200,
@@ -511,8 +509,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   quantityButton: {
-    //backgroundColor: '#FFDE59',
-    backgroundColor: '#91b38e',
+    backgroundColor: '#FFDE59',
     width: 36,
     height: 36,
     borderRadius: 18,
@@ -554,12 +551,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   buttonAdd: {
-    //backgroundColor: '#FFDE59',
-    backgroundColor: '#91b38e',
+    backgroundColor: '#FFDE59',
   },
   buttonCancel: {
-    //backgroundColor: '#ddd',
-    backgroundColor: '#5a855f',
+    backgroundColor: '#FFDE59',
   },
   textStyle: {
     color: 'black',

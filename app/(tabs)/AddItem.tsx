@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Button, Platform, Modal, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Button, Platform, Modal, Alert, ScrollView, StatusBar } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -28,6 +28,7 @@ export default function AddItem() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showUnitModal, setShowUnitModal] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
+  
 
   useEffect(() => {
     const fetchItem = async () => {
@@ -82,20 +83,33 @@ export default function AddItem() {
   };
 
   return (
+    React.useLayoutEffect(() => {
+  navigation.setOptions({
+    headerShown: true,
+    headerLeft: () => (
+      <TouchableOpacity 
+        onPress={() => navigation.goBack()}
+        style={{ marginLeft: 10 }}
+      >
+        <MaterialIcons name="arrow-back" size={24} color="#555" />
+      </TouchableOpacity>
+    ),
+  });
+}, [navigation]),
     <ScrollView contentContainerStyle={styles.container}>
       <Text 
         style={styles.title}>{editId ? 'Edit Inventory Item' : 'Add Inventory Item'}
       </Text>
 
       <TextInput 
-        style={[styles.input, { fontSize: 16 }]} 
+        style={[styles.input, { fontSize: 16 , fontFamily: 'Quicksand_400Regular' }]} 
         placeholder="Item Name" 
         placeholderTextColor="#555"
         value={name} 
         onChangeText={setName} 
       />
       <TextInput
-        style={[styles.input, { fontSize: 16 }]}
+        style={[styles.input, { fontSize: 16, fontFamily: 'Quicksand_400Regular' }]}
         placeholder="Quantity"
         placeholderTextColor="#555"
         value={quantity}
@@ -176,7 +190,6 @@ export default function AddItem() {
         <Text style={styles.addButtonText}>{editId ? 'Update Item' : 'Add Item'}</Text>
     </TouchableOpacity>
 
-
     </ScrollView>
   );
 }
@@ -184,14 +197,15 @@ export default function AddItem() {
 const styles = StyleSheet.create({
  container: {
     flex: 1,
-    backgroundColor: '#f8f9fa', 
+    backgroundColor: '#FFF', 
     padding: 20,
 },  
   title: { 
-    fontSize: 24, 
-    fontWeight: 'bold', 
-    marginBottom: 15, 
-    textAlign: 'center' 
+    fontSize: 30, 
+    fontFamily: 'Quicksand_700Bold',
+    marginBottom: '20%', 
+    textAlign: 'center', 
+    marginTop: '20%',
 },
   input: {
     backgroundColor: '#fff',
@@ -211,7 +225,8 @@ const styles = StyleSheet.create({
   },
   pickerText: { 
     fontSize: 16, 
-    color: '#555' 
+    color: '#555' ,
+    fontFamily: 'Quicksand_400Regular',
 },
   modalOverlay: {
     flex: 1,
@@ -231,12 +246,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalItemText: { 
-    fontSize: 18 
+    fontSize: 18, 
+    fontFamily: 'Quicksand_400Regular',
 },
   cancel: {
     marginTop: 20,
     fontSize: 16,
     color: 'red',
+    fontFamily: 'Quicksand_400Regular',
   },
   addButton: {
     paddingVertical: 14,
@@ -248,16 +265,52 @@ const styles = StyleSheet.create({
   },
   
   createButton: {
-    backgroundColor: '#91b38e',
+    backgroundColor: '#FFDE59',
   },
   
   updateButton: {
-    backgroundColor: '#5a855f',
+    backgroundColor: '#FFDE59',
   },
   
   addButtonText: {
-    color: '#FFFFFF',
+    color: '#000',
     fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: 'Quicksand_400Regular',
   },  
+  bottomNavigation: {
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  right: 0,
+  height: 70,
+  backgroundColor: '#FFF',
+  flexDirection: 'row',
+  justifyContent: 'space-around',
+  alignItems: 'center',
+  borderTopWidth: 1,
+  borderTopColor: '#ECECEC',
+  paddingHorizontal: 10,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: -2 },
+  shadowOpacity: 0.05,
+  shadowRadius: 3,
+  elevation: 5,
+},
+navItem: {
+  alignItems: 'center',
+  justifyContent: 'center',
+  flex: 1,
+},
+navText: {
+  fontFamily: 'Quicksand_400Regular',
+  fontSize: 12,
+  marginTop: 4,
+  color: '#777',
+},
+modalOverlayNav: {
+  flex: 1,
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  justifyContent: 'flex-end',
+  alignItems: 'center',
+},
 });

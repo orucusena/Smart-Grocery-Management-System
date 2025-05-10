@@ -1,7 +1,7 @@
-import { View, Text, StyleSheet, TextInput, ActivityIndicator, Button, KeyboardAvoidingView, TouchableOpacity, StatusBar } from 'react-native'
+import { View, Text, StyleSheet, TextInput, ActivityIndicator, KeyboardAvoidingView, TouchableOpacity, StatusBar } from 'react-native'
 import React, { useState } from 'react';
 import { FIREBASE_AUTH } from '@/firebaseConfig'; 
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { NavigationProp } from '@react-navigation/native';
 import { useFonts, Quicksand_400Regular, Quicksand_700Bold } from '@expo-google-fonts/quicksand';
 
@@ -45,7 +45,7 @@ const SignupPage = ({ navigation }: RouterProps) => {
 
     return (
         <View style={styles.container}>
-            <StatusBar barStyle="light-content" /*backgroundColor="#FFDE59"*/ backgroundColor="#91b38e"/>
+            <StatusBar barStyle="light-content" backgroundColor="#FFDE59"/>
 
             <View style={styles.topSection}>
                 <Text style={styles.topSectionText}>SIGN UP</Text>
@@ -93,8 +93,7 @@ export default SignupPage;
 const styles = StyleSheet.create({
     container: {
     flex: 1,
-    //backgroundColor: '#FFDE59',
-    backgroundColor:'#91b38e',
+    backgroundColor: '#FFDE59',
 },
     input: {
         marginVertical: 10,
@@ -108,8 +107,7 @@ const styles = StyleSheet.create({
     height: '18%',
     justifyContent: 'center',
     alignItems: 'center',
-    //backgroundColor: '#FFDE59',
-    backgroundColor:'#91b38e',
+    backgroundColor: '#FFDE59',
   },
   bottomSection: {
     flex: 1,
@@ -136,8 +134,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
-    //backgroundColor: '#FFDE59', // Pop of color
-    backgroundColor: '#91b38e',
+    backgroundColor: '#FFDE59',
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -150,8 +147,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   signupText: {
-    //color: '#FFDE59',
-    color: '#91b38e',
+    color: '#FFDE59',
     textDecorationLine: 'underline',
   },
   bottomTextContainer: {

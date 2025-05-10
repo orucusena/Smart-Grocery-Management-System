@@ -80,13 +80,13 @@ export default function ExpiringSoonScreen() {
             return (
               <View key={item.id} style={[styles.item, { borderLeftColor: urgencyColor, borderLeftWidth: 6 }]}>
                 <Text style={styles.itemName}>
-                  <MaterialIcons name="shopping-cart" size={16} color="#91b38e" /> {item.name}
+                  <MaterialIcons name="shopping-cart" size={16} color="#FFDE59" /> {item.name}
                 </Text>
                 <Text style={styles.detail}>
                   <MaterialIcons name="event" size={16} color="#888" /> {item.expirationDate}
                 </Text>
                 <Text style={styles.detail}>
-                  <MaterialIcons name="category" size={16} color="#888" /> {item.category}
+                  <MaterialIcons name="category" size={16} color="#FFDE59" /> {item.category}
                 </Text>
                 <Text style={styles.detail}>
                   <Entypo name="calculator" size={16} color="#888" /> {item.quantity} {item.unit}
@@ -123,10 +123,11 @@ const styles = StyleSheet.create({
   loading: {
     fontSize: 18,
     color: 'blue',
+    fontFamily: 'Quicksand_400Regular',
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontFamily: 'Quicksand_700Bold',
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -140,20 +141,24 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: 'Quicksand_700Bold',
   },
   detail: {
     fontSize: 16,
     marginTop: 4,
     color: '#555',
+    fontFamily: 'Quicksand_400Regular',
   },
   urgency: {
     fontSize: 14,
     marginTop: 6,
     fontStyle: 'italic',
+    fontFamily: 'Quicksand_400Regular',
   },
   empty: {
     fontSize: 16,
     color: 'gray',
     marginTop: 12,
+    fontFamily: 'Quicksand_400Regular',
   },
 });

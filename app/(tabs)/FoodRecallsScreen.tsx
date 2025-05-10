@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator,RefreshControl,SafeAreaView,StatusBar,Modal,TouchableOpacity,ScrollView } from 'react-native';
-import { MaterialIcons, Entypo } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { NavigationProp } from '@react-navigation/native';
 
 
@@ -117,7 +117,7 @@ const FoodRecallsScreen = ( {navigation}: RouterProps ) => {
       return '#99cc00'; // Green for Class III (least severe)
     }
     
-    return '#999'; // Default gray
+    return '#999'; 
   };
   
   // Get classification description
@@ -279,7 +279,7 @@ const FoodRecallsScreen = ( {navigation}: RouterProps ) => {
     );
   };
   
-  // Render separator between items
+  //Separator between items
   const renderSeparator = () => (
     <View style={styles.separator} />
   );
@@ -334,13 +334,14 @@ const FoodRecallsScreen = ( {navigation}: RouterProps ) => {
       )}
       
       {renderRecallModal()}
+
       {/* Bottom Navigation */}
 <View style={styles.bottomNavigation}>
   <TouchableOpacity 
     style={styles.navItem} 
     onPress={() => navigation.navigate('Dashboard')}
   >
-    <MaterialIcons name="home" size={24} /*color="#FFDE59" */ color="#91b38e"/>
+    <MaterialIcons name="home" size={24} />
     <Text style={styles.navText}>Home</Text>
   </TouchableOpacity>
   
@@ -417,8 +418,7 @@ const FoodRecallsScreen = ( {navigation}: RouterProps ) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    //backgroundColor: '#FFDE59',
-    backgroundColor: '#91b38e',
+    backgroundColor: '#FFDE59',
   },
   loadingContainer: {
     flex: 1,
@@ -445,8 +445,7 @@ const styles = StyleSheet.create({
   },
   listHeader: {
     padding: 16,
-    //backgroundColor: '#FFDE59',
-    backgroundColor: '#91b38e',
+    backgroundColor: '#FFDE59',
     marginBottom: 8,
   },
   listHeaderTitle: {
@@ -495,7 +494,6 @@ const styles = StyleSheet.create({
   },
   productText: {
     fontSize: 18,
-    //fontWeight: 'bold',
     fontFamily: 'Quicksand_700Bold',
     color: '#333',
     marginBottom: 4,
@@ -514,7 +512,6 @@ const styles = StyleSheet.create({
   separator: {
     height: 1,
     backgroundColor: '#eeeeee',
-    //backgroundColor:  '#FFDE59',
   },
   emptyContainer: {
     padding: 20,
@@ -603,8 +600,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Quicksand_400Regular',
   },
   closeButton: {
-    //backgroundColor: '#FFDE59',
-    backgroundColor: '#91b38e',
+    backgroundColor: '#FFDE59',
     padding: 16,
     alignItems: 'center',
   },
@@ -656,7 +652,7 @@ addOptionsContainer: {
   borderTopLeftRadius: 20,
   borderTopRightRadius: 20,
   width: '100%',
-  paddingBottom: 90, // Space for the bottom nav
+  paddingBottom: 90, 
   paddingTop: 20,
 },
 addOption: {

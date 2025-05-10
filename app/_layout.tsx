@@ -9,7 +9,6 @@ import 'react-native-reanimated';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './(tabs)/Login';
 import List from './(tabs)/List';
-import Details from './(tabs)/Details';
 import WelcomePage from './(tabs)/WelcomePage';
 import SignupPage from './(tabs)/SignupPage';
 import { useState } from 'react';
@@ -50,16 +49,15 @@ function InsideLayout() {
   return (
     <InsideStack.Navigator>
       <InsideStack.Screen name="Dashboard" component={List} options={{ headerShown: false }} />
-      <InsideStack.Screen name="Details" component={Details} />
-      <InsideStack.Screen name="Inventory" component={Inventory} />
-      <InsideStack.Screen name="AddItem" component={AddItem} options={{ title: 'Add Item' }} />
+      <InsideStack.Screen name="Inventory" component={Inventory} options={{ headerShown: false }} />
+      <InsideStack.Screen name="AddItem" component={AddItem} options={{ title: '', headerShown: false}} />
       <InsideStack.Screen name="BarcodeScanning" component={BarcodeScanning} options={{ title: 'Barcode Scanning' }} />
       <InsideStack.Screen name="ExpiringSoon" component={ExpiringSoon} options={{ title: 'Expiring Soon' }} />
       <InsideStack.Screen name="RecipeSuggestions" component={RecipeSuggestions} options={{ title: 'Recipe Suggestions' }} />
       <InsideStack.Screen name="MealDetailsScreen" component={MealDetailsScreen} options={{ title: 'Recipe Details' }} />
       <InsideStack.Screen name="FoodRecallsScreen" component={FoodRecallsScreen} options={{ title: 'Food Recalls' }} />
-      <InsideStack.Screen name="MyProfile" component={MyProfile} options={{ title: 'My Profile' }} />
-      <InsideStack.Screen name="AboutUs" component={AboutUs} options={{ title: 'About Us' }} />
+      <InsideStack.Screen name="MyProfile" component={MyProfile} options={{ title: 'My Profile', headerShown: false  }}  />
+      <InsideStack.Screen name="AboutUs" component={AboutUs} options={{ title: 'About Us', headerShown: false }} />
     </InsideStack.Navigator>
   );
 }
