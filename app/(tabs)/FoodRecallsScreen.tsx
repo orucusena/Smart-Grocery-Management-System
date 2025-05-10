@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator,RefreshControl,SafeAreaView,StatusBar,Modal,TouchableOpacity,ScrollView } from 'react-native';
+import { MaterialIcons, Entypo } from '@expo/vector-icons';
+import { NavigationProp } from '@react-navigation/native';
+
+
+interface RouterProps {
+    navigation: NavigationProp<any, any>;
+}
 
 // TypeScript interface for recall items
 interface RecallItem {
@@ -20,13 +27,15 @@ interface RecallItem {
   country?: string;
 }
 
-const FoodRecallsScreen = () => {
+const FoodRecallsScreen = ( {navigation}: RouterProps ) => {
   const [recalls, setRecalls] = useState<RecallItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedRecall, setSelectedRecall] = useState<RecallItem | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+
+  const [addMenuVisible, setAddMenuVisible] = useState(false);
   
   // Fetch food recalls from FDA API
   const fetchRecalls = async () => {
@@ -236,6 +245,8 @@ const FoodRecallsScreen = () => {
           </View>
         </View>
       </Modal>
+
+      
     );
   };
   
@@ -323,6 +334,82 @@ const FoodRecallsScreen = () => {
       )}
       
       {renderRecallModal()}
+      {/* Bottom Navigation */}
+<View style={styles.bottomNavigation}>
+  <TouchableOpacity 
+    style={styles.navItem} 
+    onPress={() => navigation.navigate('Dashboard')}
+  >
+    <MaterialIcons name="home" size={24} /*color="#FFDE59" */ color="#91b38e"/>
+    <Text style={styles.navText}>Home</Text>
+  </TouchableOpacity>
+  
+  <TouchableOpacity 
+    style={styles.navItem}
+    onPress={() => navigation.navigate('Inventory')}
+  >
+    <MaterialIcons name="list" size={24} color="#777" />
+    <Text style={styles.navText}>Inventory</Text>
+  </TouchableOpacity>
+  
+  
+  <TouchableOpacity 
+    style={styles.navItem}
+    onPress={() => navigation.navigate('FoodRecallsScreen')}>
+    <MaterialIcons name="report-problem" size={24} color="#777" />
+    <Text style={styles.navText}>Recalls</Text>
+  </TouchableOpacity>
+  
+  <TouchableOpacity 
+      style={styles.navItem}
+      onPress={() => navigation.navigate('RecipeSuggestions')}
+    >
+      <MaterialIcons name="restaurant" size={24} color="#777" />
+      <Text style={styles.navText}>Recipes</Text>
+    </TouchableOpacity>
+</View>
+
+{/* Add Options Modal */}
+<Modal
+  transparent={true}
+  visible={addMenuVisible}
+  animationType="fade"
+  onRequestClose={() => setAddMenuVisible(false)}
+>
+  <TouchableOpacity 
+    style={styles.modalOverlayNav}
+    activeOpacity={1}
+    onPress={() => setAddMenuVisible(false)}
+  >
+    <View style={styles.addOptionsContainer}>
+      <TouchableOpacity
+        style={styles.addOption}
+        onPress={() => {
+          setAddMenuVisible(false);
+          navigation.navigate('BarcodeScanning');
+        }}
+      >
+        <MaterialIcons name="qr-code-scanner" size={28} color="#333" />
+        <Text style={styles.addOptionText}>Scan Barcode</Text>
+      </TouchableOpacity>
+      
+      <View style={styles.optionDivider} />
+      
+      <TouchableOpacity
+        style={styles.addOption}
+        onPress={() => {
+          setAddMenuVisible(false);
+          navigation.navigate('Inventory', { screen: 'AddManually' });
+        }}
+      >
+        <MaterialIcons name="edit" size={28} color="#333" />
+        <Text style={styles.addOptionText}>Add Manually</Text>
+      </TouchableOpacity>
+    </View>
+  </TouchableOpacity>
+</Modal>
+
+
     </SafeAreaView>
   );
 };
@@ -330,7 +417,8 @@ const FoodRecallsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    //backgroundColor: '#FFDE59',
+    backgroundColor: '#91b38e',
   },
   loadingContainer: {
     flex: 1,
@@ -341,6 +429,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
     color: '#666',
+    fontFamily: 'Quicksand_400Regular',
   },
   errorContainer: {
     flex: 1,
@@ -352,22 +441,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#dc3545',
     textAlign: 'center',
+    fontFamily: 'Quicksand_400Regular',
   },
   listHeader: {
     padding: 16,
-    backgroundColor: '#ffffff',
+    //backgroundColor: '#FFDE59',
+    backgroundColor: '#91b38e',
     marginBottom: 8,
   },
   listHeaderTitle: {
-    fontSize: 22,
+    fontSize: 25,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 4,
+    fontFamily: 'Quicksand_700Bold',
   },
   listHeaderSubtitle: {
     fontSize: 14,
-    color: '#666',
+    color: '#000',
     marginBottom: 12,
+    fontFamily: 'Quicksand_400Regular',
   },
   legendContainer: {
     flexDirection: 'row',
@@ -375,9 +468,10 @@ const styles = StyleSheet.create({
   },
   legendItem: {
     fontSize: 12,
-    color: '#666',
+    color: '#000',
     marginRight: 10,
     marginBottom: 4,
+    fontFamily: 'Quicksand_400Regular',
   },
   recallItem: {
     backgroundColor: '#ffffff',
@@ -391,15 +485,18 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 12,
     color: '#666',
+    fontFamily: 'Quicksand_400Regular',
   },
   classText: {
     fontSize: 12,
     color: '#666',
     fontWeight: '500',
+    fontFamily: 'Quicksand_700Bold',
   },
   productText: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 18,
+    //fontWeight: 'bold',
+    fontFamily: 'Quicksand_700Bold',
     color: '#333',
     marginBottom: 4,
   },
@@ -407,14 +504,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginBottom: 8,
+    fontFamily: 'Quicksand_400Regular',
   },
   reasonText: {
     fontSize: 14,
     color: '#555',
+    fontFamily: 'Quicksand_700Bold',
   },
   separator: {
     height: 1,
     backgroundColor: '#eeeeee',
+    //backgroundColor:  '#FFDE59',
   },
   emptyContainer: {
     padding: 20,
@@ -423,8 +523,8 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     color: '#666',
+    fontFamily: 'Quicksand_400Regular',
   },
-  // Modal styles
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -449,14 +549,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#ff4444',
   },
   modalClassification: {
-    color: 'white',
+    color: 'black',
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 4,
+    fontFamily: 'Quicksand_400Regular',
   },
   modalDate: {
-    color: 'white',
+    color: 'black',
     fontSize: 14,
+    fontFamily: 'Quicksand_400Regular',
   },
   modalBody: {
     padding: 16,
@@ -466,6 +568,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 16,
+    fontFamily: 'Quicksand_700Bold',
   },
   modalSection: {
     marginBottom: 16,
@@ -475,11 +578,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#555',
     marginBottom: 4,
+    fontFamily: 'Quicksand_700Bold',
   },
   modalSectionContent: {
     fontSize: 15,
     color: '#333',
     lineHeight: 22,
+    fontFamily: 'Quicksand_400Regular',
   },
   infoLabel: {
     fontWeight: '500',
@@ -495,17 +600,82 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#999',
     textAlign: 'center',
+    fontFamily: 'Quicksand_400Regular',
   },
   closeButton: {
-    backgroundColor: '#0066cc',
+    //backgroundColor: '#FFDE59',
+    backgroundColor: '#91b38e',
     padding: 16,
     alignItems: 'center',
   },
   closeButtonText: {
-    color: 'white',
+    color: 'black',
     fontSize: 16,
     fontWeight: 'bold',
+    fontFamily: 'Quicksand_700Bold',
   },
+
+bottomNavigation: {
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  right: 0,
+  height: 70,
+  backgroundColor: '#FFF',
+  flexDirection: 'row',
+  justifyContent: 'space-around',
+  alignItems: 'center',
+  borderTopWidth: 1,
+  borderTopColor: '#ECECEC',
+  paddingHorizontal: 10,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: -2 },
+  shadowOpacity: 0.05,
+  shadowRadius: 3,
+  elevation: 5,
+},
+navItem: {
+  alignItems: 'center',
+  justifyContent: 'center',
+  flex: 1,
+},
+navText: {
+  fontFamily: 'Quicksand_400Regular',
+  fontSize: 12,
+  marginTop: 4,
+  color: '#777',
+},
+modalOverlayNav: {
+  flex: 1,
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  justifyContent: 'flex-end',
+  alignItems: 'center',
+},
+addOptionsContainer: {
+  backgroundColor: 'white',
+  borderTopLeftRadius: 20,
+  borderTopRightRadius: 20,
+  width: '100%',
+  paddingBottom: 90, // Space for the bottom nav
+  paddingTop: 20,
+},
+addOption: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  padding: 16,
+  paddingHorizontal: 25,
+},
+addOptionText: {
+  fontSize: 16,
+  marginLeft: 15,
+  fontWeight: '500',
+  color: '#333',
+},
+optionDivider: {
+  height: 1,
+  backgroundColor: '#eee',
+  marginHorizontal: 15,
+},
 });
 
 export default FoodRecallsScreen;

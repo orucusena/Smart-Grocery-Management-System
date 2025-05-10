@@ -1,18 +1,19 @@
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, Modal, Platform, TextInput} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { addDoc, collection } from 'firebase/firestore';
 import { FIREBASE_DB, FIREBASE_AUTH } from '@/firebaseConfig'; 
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const BarcodeScanning = () => {
-  const [facing, setFacing] = useState<CameraType>('back');  //default is 'back' camera.
+  const [facing] = useState<CameraType>('back');  //default is 'back' camera.
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const [loading, setLoading] = useState(false);
   const hasScannedRef = useRef(false);
   
-  // State for the add item modal
+  // Add item modal
   const [modalVisible, setModalVisible] = useState(false);
   const [scannedProduct, setScannedProduct] = useState<any>(null);
   const [quantity, setQuantity] = useState('1');  //Stores the quantity, initially set to "1".
@@ -29,9 +30,9 @@ const BarcodeScanning = () => {
   const categoryOptions = ['Vegetbales', 'Fruits', 'Dairy', 'Grains', 'Meat', 'Beverages', 'Snacks', 'Other'];
   const unitOptions = ['pcs', 'kg', 'g', 'l', 'ml', 'oz', 'lb'];
 
-  // Format date for display
+  // Format date for display. Format: YYYY-MM-DD
   const formatDate = (date: Date) => {
-    return date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    return date.toISOString().split('T')[0]; 
   };
   
   // Handle date change
@@ -186,12 +187,7 @@ const BarcodeScanning = () => {
             facing={facing}
             onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
             barcodeScannerSettings={{
-              barcodeTypes: [
-                'ean13',
-                'upc_a',
-                'qr',
-                'code128'
-              ]
+              barcodeTypes: ['ean13', 'upc_a', 'qr', 'code128']
             }}
           >
             <View style={styles.overlay}>
@@ -224,7 +220,6 @@ const BarcodeScanning = () => {
           >
             <View style={styles.centeredView}>
               <View style={styles.modalView}>
-                <Text style={styles.modalTitle}>Add to Inventory</Text>
                 
                 {scannedProduct && (
                   <View style={styles.productInfo}>
@@ -232,7 +227,7 @@ const BarcodeScanning = () => {
                     <Text style={styles.productBrand}>{scannedProduct.brand}</Text>
                   </View>
                 )}
-                
+                 <KeyboardAwareScrollView>
                 <View style={styles.formGroup}>
                   <Text style={styles.label}>Quantity:</Text>
                   <View style={styles.quantityContainer}>
@@ -258,12 +253,13 @@ const BarcodeScanning = () => {
                     </TouchableOpacity>
                   </View>
                 </View>
+                
 
                 {/* Category Picker Modal */}
                 <View style={styles.formGroup}>
                   <Text style={styles.label}>Category:</Text>
                   <TouchableOpacity onPress={() => setIsCategoryModalVisible(true)} style={styles.unitPicker}>
-                    <Text style={styles.unitText}>📂 Category: {selectedCategory || 'Select'}</Text>
+                    <Text style={styles.unitText}>Category: {selectedCategory || 'Select'}</Text>
                   </TouchableOpacity>
                 </View>
                 
@@ -271,7 +267,7 @@ const BarcodeScanning = () => {
                 <View style={styles.formGroup}>
                   <Text style={styles.label}>Unit:</Text>
                   <TouchableOpacity onPress={() => setIsUnitModalVisible(true)} style={styles.unitPicker}>
-                    <Text style={styles.unitText}>📏 Unit: {selectedUnit}</Text>
+                    <Text style={styles.unitText}>Unit: {selectedUnit}</Text>
                   </TouchableOpacity>
                 </View>
                 
@@ -347,6 +343,7 @@ const BarcodeScanning = () => {
                     />
                   )}
                 </View>
+                </KeyboardAwareScrollView>
                 
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity
@@ -355,6 +352,7 @@ const BarcodeScanning = () => {
                   >
                     <Text style={styles.textStyle}>Cancel</Text>
                   </TouchableOpacity>
+            
                   <TouchableOpacity
                     style={[styles.button, styles.buttonAdd]}
                     onPress={addToInventory}
@@ -386,6 +384,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     paddingHorizontal: 30,
+    fontFamily: 'Quicksand_400Regular',
   },
   permissionButton: {
     backgroundColor: '#4CAF50',
@@ -398,6 +397,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+    fontFamily: 'Quicksand_400Regular',
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
@@ -408,7 +408,8 @@ const styles = StyleSheet.create({
     width: 250,
     height: 250,
     borderWidth: 2,
-    borderColor: '#4CAF50',
+    //borderColor: '#4CAF50',
+    borderColor: '#91b38e',
     backgroundColor: 'transparent',
   },
   instructionText: {
@@ -419,21 +420,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
+    fontFamily: 'Quicksand_400Regular',
   },
   scanAgainButton: {
     position: 'absolute',
     bottom: 60,
     alignSelf: 'center',
-    backgroundColor: '#4CAF50',
+    //backgroundColor: '#4CAF50',
+    backgroundColor:'#91b38e',
     padding: 15,
     borderRadius: 8,
     width: 200,
     alignItems: 'center',
+    fontFamily: 'Quicksand_400Regular',
   },
   buttonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+    fontFamily: 'Quicksand_400Regular',
   },
   loadingContainer: {
     flex: 1,
@@ -445,6 +450,7 @@ const styles = StyleSheet.create({
     color: 'white',
     marginTop: 20,
     fontSize: 16,
+    fontFamily: 'Quicksand_400Regular',
   },
   centeredView: {
     flex: 1,
@@ -471,6 +477,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 15,
+    fontFamily: 'Quicksand_700Bold',
   },
   productInfo: {
     alignItems: 'center',
@@ -481,11 +488,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     textAlign: 'center',
+    fontFamily: 'Quicksand_700Bold',
   },
   productBrand: {
     fontSize: 14,
     color: '#666',
     marginTop: 5,
+    fontFamily: 'Quicksand_400Regular',
   },
   formGroup: {
     marginBottom: 15,
@@ -494,6 +503,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginBottom: 8,
+    fontFamily: 'Quicksand_400Regular',
   },
   quantityContainer: {
     flexDirection: 'row',
@@ -501,7 +511,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   quantityButton: {
-    backgroundColor: '#4CAF50',
+    //backgroundColor: '#FFDE59',
+    backgroundColor: '#91b38e',
     width: 36,
     height: 36,
     borderRadius: 18,
@@ -509,9 +520,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   quantityButtonText: {
-    color: 'white',
+    color: 'black',
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: 'Quicksand_400Regular',
   },
   quantityInput: {
     borderWidth: 1,
@@ -522,6 +533,7 @@ const styles = StyleSheet.create({
     width: 50,
     textAlign: 'center',
     fontSize: 16,
+    fontFamily: 'Quicksand_400Regular',
   },
   datePickerButton: {
     borderWidth: 1,
@@ -542,17 +554,18 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   buttonAdd: {
-    backgroundColor: '#4CAF50',
+    //backgroundColor: '#FFDE59',
+    backgroundColor: '#91b38e',
   },
   buttonCancel: {
-    backgroundColor: '#999',
+    //backgroundColor: '#ddd',
+    backgroundColor: '#5a855f',
   },
   textStyle: {
-    color: 'white',
+    color: 'black',
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  // Styles matching Inventory page
   unitPicker: {
     padding: 12,
     backgroundColor: '#fff',
@@ -565,6 +578,7 @@ const styles = StyleSheet.create({
   unitText: {
     fontSize: 16,
     color: '#555',
+    fontFamily: 'Quicksand_400Regular',
   },
   modalOverlay: {
     flex: 1,
@@ -585,11 +599,13 @@ const styles = StyleSheet.create({
   },
   modalItemText: {
     fontSize: 18,
+    fontFamily: 'Quicksand_400Regular',
   },
   modalCancel: {
     marginTop: 20,
     color: 'red',
     fontSize: 16,
+    fontFamily: 'Quicksand_400Regular',
   },
 });
 

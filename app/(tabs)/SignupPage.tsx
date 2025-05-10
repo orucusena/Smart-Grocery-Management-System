@@ -1,9 +1,9 @@
-import { View, Text, StyleSheet, TextInput, ActivityIndicator, Button, KeyboardAvoidingView } from 'react-native'
+import { View, Text, StyleSheet, TextInput, ActivityIndicator, Button, KeyboardAvoidingView, TouchableOpacity, StatusBar } from 'react-native'
 import React, { useState } from 'react';
 import { FIREBASE_AUTH } from '@/firebaseConfig'; 
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { TouchableOpacity } from "react-native";
 import { NavigationProp } from '@react-navigation/native';
+import { useFonts, Quicksand_400Regular, Quicksand_700Bold } from '@expo-google-fonts/quicksand';
 
 
 interface RouterProps {
@@ -11,6 +11,12 @@ interface RouterProps {
 }
 
 const SignupPage = ({ navigation }: RouterProps) => {
+
+    
+    let [fontsLoaded] = useFonts({
+        Quicksand_400Regular,
+        Quicksand_700Bold,
+    });
 
     const [fname, setFname] = useState('');
     const [lname, setLname] = useState('');
@@ -33,32 +39,47 @@ const SignupPage = ({ navigation }: RouterProps) => {
         }
     }
 
-    const fnameToNextScreen = () => {
-        // Navigate to the next screen and pass `fname` as a parameter
-        navigation.navigate('List', { fname });
-    };
-
     return (
         <View style={styles.container}>
-            <KeyboardAvoidingView behavior='padding'>
+            <StatusBar barStyle="light-content" /*backgroundColor="#FFDE59"*/ backgroundColor="#91b38e"/>
 
+            <View style={styles.topSection}>
+                <Text style={styles.topSectionText}>SIGN UP</Text>
+             </View>
+
+             <View style={styles.bottomSection}>
+            <KeyboardAvoidingView>
+
+                <View style={styles.formContainer}>
+
+                <Text>First Name</Text>
                 <TextInput value={fname} style={styles.input} placeholder="First Name" autoCapitalize="none" onChangeText={(text) => setFname(text)}></TextInput>
+                <Text>Last Name</Text>
                 <TextInput value={lname} style={styles.input} placeholder="Last Name" autoCapitalize="none" onChangeText={(text) => setLname(text)}></TextInput>
+                <Text>Email</Text>
                 <TextInput value={email} style={styles.input} placeholder="Email" autoCapitalize="none" onChangeText={(text) => setEmail(text)}></TextInput>
+                <Text>Password</Text>
                 <TextInput secureTextEntry={true} value={password} style={styles.input} placeholder="Password" autoCapitalize="none" onChangeText={(text) => setPassword(text)}></TextInput>
 
+                 <View style={styles.buttonContainer}>
                 {loading ? <ActivityIndicator size="large" color="#0000ff" />
                     : <>
-                        <Button title="Create account" onPress={signUp} />
+                        <TouchableOpacity style={styles.button} onPress={signUp}>
+                            <Text style={styles.buttonText}>Create Account</Text>
+                        </TouchableOpacity>   
                     </>
                 }
-                <Text>
-                    Already have an account {" "}
+                </View>
+                </View>
+                <View style={styles.bottomTextContainer}>
+                <Text style={styles.bottomText}>
+                    Already have an account {" "} </Text>
                     <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                        <Text style={{ color: "blue", textDecorationLine: "underline" }}>Login</Text>
+                        <Text style={styles.signupText}>login</Text>
                     </TouchableOpacity>
-                </Text>
+                    </View> 
             </KeyboardAvoidingView>
+            </View>
         </View>
     );
 };
@@ -67,16 +88,76 @@ export default SignupPage;
 
 const styles = StyleSheet.create({
     container: {
-        marginHorizontal: 20,
-        flex: 1,
-        justifyContent: 'center'
-    },
+    flex: 1,
+    //backgroundColor: '#FFDE59',
+    backgroundColor:'#91b38e',
+},
     input: {
-        marginVertical: 4,
+        marginVertical: 10,
         height: 50,
         borderWidth: 1,
         borderRadius: 4,
         padding: 10,
         backgroundColor: '#fff'
-    }
+    },
+    topSection: {
+    height: '18%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    //backgroundColor: '#FFDE59',
+    backgroundColor:'#91b38e',
+  },
+  bottomSection: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 60,
+    borderTopRightRadius: 60,
+    paddingHorizontal: 24,
+  },
+  topSectionText: {
+    fontSize: 40,
+    fontWeight: 'bold',
+    color: '#1E1E1E',
+    textAlign: 'center',
+    fontFamily: 'Quicksand-Bold',
+    marginTop: '10%',
+  },
+  formContainer: {
+    justifyContent: 'center',
+    marginVertical: 75,
+    marginHorizontal: 30,
+  },
+  buttonContainer: {
+    paddingTop: '5%', 
+    alignItems: 'center',
+  },
+  button: {
+    //backgroundColor: '#FFDE59', // Pop of color
+    backgroundColor: '#91b38e',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: 16,
+    width: '80%',
+  },
+  buttonText: {
+    color: '#00000',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  signupText: {
+    //color: '#FFDE59',
+    color: '#91b38e',
+    textDecorationLine: 'underline',
+  },
+  bottomTextContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginTop: -30,
+},
+  bottomText: {
+    textAlign: 'center',
+    color: '#000',
+  },
 });

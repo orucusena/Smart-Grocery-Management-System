@@ -34,9 +34,9 @@ const InsideStack = createNativeStackNavigator();
 function MainStack() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="WelcomePage" component={WelcomePage} />
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="SignupPage" component={SignupPage} options={{ headerBackVisible: true }} />
+      <Stack.Screen name="WelcomePage" component={WelcomePage} options={{ headerShown: false }}/>
+      <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
+      <Stack.Screen name="SignupPage" component={SignupPage} options={{ headerShown: false }}  />
     </Stack.Navigator>
   );
 }
@@ -45,14 +45,14 @@ function MainStack() {
 function InsideLayout() {
   return (
     <InsideStack.Navigator>
-      <InsideStack.Screen name="My todos" component={List} />
+      <InsideStack.Screen name="Dashboard" component={List} options={{ headerShown: false }} />
       <InsideStack.Screen name="Details" component={Details} />
-      <InsideStack.Screen name="Inventory" component={Inventory} />
+      <InsideStack.Screen name="Inventory" component={Inventory}  />
       <InsideStack.Screen name="BarcodeScanning" component={BarcodeScanning} />
       <InsideStack.Screen name="ExpiringSoon" component={ExpiringSoon} />
       <InsideStack.Screen name="RecipeSuggestions" component={RecipeSuggestions} />
       <InsideStack.Screen name="MealDetailsScreen" component={MealDetailsScreen} options={{ title: 'Recipe Details' }} />
-      <InsideStack.Screen name="FoodRecallsScreen" component={FoodRecallsScreen} />
+      <InsideStack.Screen name="FoodRecallsScreen" component={FoodRecallsScreen} options={{ headerShown: false }} />
     </InsideStack.Navigator>
   );
 }
